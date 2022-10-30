@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -49,7 +49,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="REV SPARKmini Simple Drive Example", group="Concept")
-@Disabled
+//@Disabled
 public class ConceptRevSPARKMini extends LinearOpMode {
 
     // Declare OpMode members.
@@ -65,8 +65,8 @@ public class ConceptRevSPARKMini extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotorSimple.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotorSimple.class, "right_drive");
+        leftDrive  = hardwareMap.get(DcMotorSimple.class, "leftdrive");
+        rightDrive = hardwareMap.get(DcMotorSimple.class, "rightdrive");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backward when connected directly to the battery
