@@ -36,6 +36,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
+
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
@@ -86,8 +94,49 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
     static final double     DRIVE_SPEED             = 0.6;
     static final double     TURN_SPEED              = 0.5;
 
+    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
+
+
+    private static final String[] LABELS = {
+            "1 Bolt",
+            "2 Bulb",
+            "3 Panel"
+    };
+    private static final String VUFORIA_KEY =
+            "AWg6avH/////AAABmVwGucholUoCjMJvG6Nkzm9T5d2W4ip+kZpZPSLyNRxFFzzirrh9S2aguseh3zkQslKCyjyXTMJDAy4EpbEET+bdgXeAofWJSKMwFfq/qv8wImEVyaS2O15XsqX+uhfqT/jc8dVYvvaM53xe3MmI9yKfcAuneyXZvbxZRjAWTZQjgil1piyQoNA2/bH1ZaxNmEKrHrGOBeFYS27v4erDv7LrukYnTf5zI6oROPNHzFx5mzpUDja+0gi05NFw7Y2d7CyH9fdC1cXj+meHMGHxWVWVzAfOpi6jz9SHQgJsMmG48U7btY10cpBOTkj7PUj7bUxU9enuAT/6IuKR4PywKcIdkiMxVWnW7B0XAfvuuFgO";
+    private VuforiaLocalizer vuforia;
+
+    /**
+     * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
+     * Detection engine.
+     */
+    private TFObjectDetector tfod;
+
     @Override
     public void runOpMode() {
+        initVuforia();
+        initTfod();
+
+        /**
+         * Activate TensorFlow Object Detection before we wait for the start command.
+         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+         **/
+        if (tfod != null) {
+            tfod.activate();
+
+            // The TensorFlow software will scale the input images from the camera to a lower resolution.
+            // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+            // If your target is at distance greater than 50 cm (20") you can increase the magnification value
+            // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+            // should be set to the value of the images used to create the TensorFlow Object Detection model
+            // (typically 16/9).
+            tfod.setZoom(1.0, 16.0/9.0);
+        }
+
+        /** Wait for the game to begin */
+        telemetry.addData(">", "Press Play to start op mode");
+
 
         // Initialize the drive system variables.
         leftDrive  = hardwareMap.get(DcMotor.class, "motor2");
@@ -113,13 +162,42 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        int object_id = 0;
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
+                if (tfod != null) {
+                    // getUpdatedRecognitions() will return null if no new information is available since
+                    // the last time that call was made.
+                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                    if (updatedRecognitions != null) {
+                        telemetry.addData("# Objects Detected", updatedRecognitions.size());
 
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+                        // step through the list of recognitions and display image position/size information for each one
+                        // Note: "Image number" refers to the randomized image orientation/number
+                        for (Recognition recognition : updatedRecognitions) {
+                            double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
+                            double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+                            double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
+                            double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
 
+                            telemetry.addData(""," ");
+                            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
+                            object_id = recognition.getLabel();
+                            telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
+                            telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
+                        }
+                        telemetry.update();
+                    }
+                }
+            }
+        }
+if(object_id != 0) {
+    // Step through each leg of the path,
+    // Note: Reverse movement is obtained by setting a negative distance (not speed)
+    encoderDrive(DRIVE_SPEED, 48, 48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+    encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+    encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+}
         telemetry.addData("Path", "Complete");
         telemetry.update();
         sleep(1000);  // pause to display final telemetry message.
@@ -184,5 +262,36 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             sleep(250);   // optional pause after each move.
         }
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 300;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+
+        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 }
