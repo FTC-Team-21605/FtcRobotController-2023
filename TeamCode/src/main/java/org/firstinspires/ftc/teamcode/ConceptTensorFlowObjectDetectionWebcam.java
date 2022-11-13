@@ -61,16 +61,22 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
      * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    //private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String TFOD_MODEL_ASSET = "model_20221112_163323.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
 
     private static final String[] LABELS = {
+            "1 c",
+            "2 r",
+            "3 t"
+    };
+/*    private static final String[] LABELS = {
             "1 Bolt",
             "2 Bulb",
             "3 Panel"
     };
-
+ */
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.

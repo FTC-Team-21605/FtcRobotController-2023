@@ -162,7 +162,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        int object_id = 0;
+        String object_id = "0";
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 if (tfod != null) {
@@ -191,7 +191,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
                 }
             }
         }
-if(object_id != 0) {
+if(object_id != "0") {
     // Step through each leg of the path,
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
     encoderDrive(DRIVE_SPEED, 48, 48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
