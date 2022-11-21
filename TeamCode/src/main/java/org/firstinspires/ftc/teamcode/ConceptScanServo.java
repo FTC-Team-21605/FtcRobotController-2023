@@ -53,9 +53,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ConceptScanServo extends LinearOpMode {
 
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
-    static final int    CYCLE_MS    =   50;     // period of each cycle
-    static final double MAX_POS     =  1.0;     // Maximum rotational position
-    static final double MIN_POS     =  0.0;     // Minimum rotational position
+    static final int    CYCLE_MS    =   200;     // period of each cycle
+    static final double MAX_POS     =  0.9;     // Maximum rotational position
+    static final double MIN_POS     =  0.8;     // Minimum rotational position
 
     // Define class members
     Servo   servo;
@@ -97,6 +97,7 @@ public class ConceptScanServo extends LinearOpMode {
                 }
             }
 
+            //position = 0.6;
             // Display the current value
             telemetry.addData("Servo Position", "%5.2f", position);
             telemetry.addData(">", "Press Stop to end test." );
