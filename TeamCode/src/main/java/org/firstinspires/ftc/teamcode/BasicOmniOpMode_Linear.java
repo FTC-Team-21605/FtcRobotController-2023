@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -69,7 +70,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
+    private DcMotorSimple leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
@@ -79,8 +80,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "motor1");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "motor3");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "motor0");
+        leftBackDrive  = hardwareMap.get(DcMotorSimple.class, "motor3");
         rightBackDrive = hardwareMap.get(DcMotor.class, "motor2");
 
         // ########################################################################################
@@ -94,7 +95,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
         // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
@@ -110,9 +111,9 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
-            double yaw     =  gamepad1.right_stick_x;
+            double axial   = -gamepad1.left_stick_y/2.;  // Note: pushing stick forward gives negative value
+            double lateral =  gamepad1.left_stick_x/2.;
+            double yaw     =  gamepad1.right_stick_x/2.;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
