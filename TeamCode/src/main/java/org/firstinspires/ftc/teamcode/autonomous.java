@@ -96,14 +96,15 @@ public class autonomous extends LinearOpMode {
     static final double     DRIVE_SPEED             = 0.6;
     static final double     TURN_SPEED              = 0.5;
 
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+//    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String TFOD_MODEL_ASSET = "model_20221120_134403.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
 
     private static final String[] LABELS = {
-            "1 r",
-            "2 t",
-            "3 c"
+            "1 c",
+            "2 r",
+            "3 t"
     };
     private static final String VUFORIA_KEY =
             "AWg6avH/////AAABmVwGucholUoCjMJvG6Nkzm9T5d2W4ip+kZpZPSLyNRxFFzzirrh9S2aguseh3zkQslKCyjyXTMJDAy4EpbEET+bdgXeAofWJSKMwFfq/qv8wImEVyaS2O15XsqX+uhfqT/jc8dVYvvaM53xe3MmI9yKfcAuneyXZvbxZRjAWTZQjgil1piyQoNA2/bH1ZaxNmEKrHrGOBeFYS27v4erDv7LrukYnTf5zI6oROPNHzFx5mzpUDja+0gi05NFw7Y2d7CyH9fdC1cXj+meHMGHxWVWVzAfOpi6jz9SHQgJsMmG48U7btY10cpBOTkj7PUj7bUxU9enuAT/6IuKR4PywKcIdkiMxVWnW7B0XAfvuuFgO";
@@ -166,9 +167,9 @@ public class autonomous extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        String object_id = "c";
+        String object_id = "0";
         if (opModeIsActive()) {
-           // while (opModeIsActive()) {
+            while (object_id == "0") {
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -191,11 +192,15 @@ public class autonomous extends LinearOpMode {
                             telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
                         }
                         telemetry.update();
+                        //break;
                     }
                 }
-            //}
+            }
         }
-if(object_id == "c") {
+        telemetry.addData("found ", object_id);
+        telemetry.update();
+        sleep(1000);
+if(object_id == "1 c") {
     // Step through each leg of the path,
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
     encoderDrive(DRIVE_SPEED, 48, 48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
