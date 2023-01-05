@@ -42,6 +42,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -88,8 +89,8 @@ public class autonomous extends LinearOpMode {
     // For example, use a value of 2.0 for a 12-tooth spur gear driving a 24-tooth spur gear.
     // This is gearing DOWN for less speed and more torque.
     // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
-    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
+    static final double     COUNTS_PER_MOTOR_REV    = 28 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 20.0 ;     // No External Gearing.
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
@@ -152,6 +153,8 @@ public class autonomous extends LinearOpMode {
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -169,7 +172,7 @@ public class autonomous extends LinearOpMode {
         waitForStart();
         String object_id = "0";
         if (opModeIsActive()) {
-            while (object_id == "0") {
+            while (Objects.equals(object_id, "0")) {
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -197,19 +200,20 @@ public class autonomous extends LinearOpMode {
                 }
             }
         }
-        telemetry.addData("found ", object_id);
+        telemetry.addData("found ", "%s", object_id);
         telemetry.update();
         sleep(1000);
-if(object_id == "1 c") {
+if(Objects.equals(object_id, "3 t"))
+{
     // Step through each leg of the path,
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
-    encoderDrive(DRIVE_SPEED, 48, 48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+    encoderDrive(DRIVE_SPEED, 36, 36, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
     //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
     //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 }
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-        sleep(1000);  // pause to display final telemetry message.
+    //    telemetry.addData("Path", "Complete");
+    //    telemetry.update();
+      //  sleep(1000);  // pause to display final telemetry message.
     }
 
     /*
@@ -225,6 +229,9 @@ if(object_id == "1 c") {
                              double timeoutS) {
         int newLeftTarget;
         int newRightTarget;
+        telemetry.addData("lfin", "%.0f %.0f / %.0f", speed, leftInches, rightInches);
+        telemetry.update();
+        sleep(10000);  // pause to display final telemetry message.
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
@@ -243,6 +250,8 @@ if(object_id == "1 c") {
             runtime.reset();
             leftFrontDrive.setPower(Math.abs(speed));
             rightFrontDrive.setPower(Math.abs(speed));
+            leftBackDrive.setPower(Math.abs(speed));
+            rightBackDrive.setPower(Math.abs(speed));
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -264,6 +273,8 @@ if(object_id == "1 c") {
             // Stop all motion;
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
+            leftBackDrive.setPower(0);
+            rightBackDrive.setPower(0);
 
             // Turn off RUN_TO_POSITION
             leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
