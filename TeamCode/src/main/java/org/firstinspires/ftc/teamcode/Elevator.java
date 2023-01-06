@@ -88,8 +88,15 @@ public class Elevator extends LinearOpMode {
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            leftPower    = gamepad1.left_stick_y;
-
+            if (gamepad1.right_bumper && !gamepad1.left_bumper) {
+                leftPower = 0.5;
+            }
+            else if (gamepad1.left_bumper && !gamepad1.right_bumper){
+                leftPower = -0.5;
+            }
+            else {
+                leftPower = 0;
+            }
 
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
