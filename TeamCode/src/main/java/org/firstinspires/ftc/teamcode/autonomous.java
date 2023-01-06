@@ -98,7 +98,8 @@ public class autonomous extends LinearOpMode {
     static final double     TURN_SPEED              = 0.5;
 
 //    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    private static final String TFOD_MODEL_ASSET = "model_20221120_134403.tflite";
+    private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
+    //private static final String TFOD_MODEL_ASSET = "model_20221120_134403.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
 
@@ -122,10 +123,10 @@ public class autonomous extends LinearOpMode {
         initVuforia();
         initTfod();
 
-        /**
+        /*
          * Activate TensorFlow Object Detection before we wait for the start command.
          * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-         **/
+         */
         if (tfod != null) {
             tfod.activate();
 
@@ -138,7 +139,7 @@ public class autonomous extends LinearOpMode {
             tfod.setZoom(1.0, 16.0/9.0);
         }
 
-        /** Wait for the game to begin */
+        /* Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
 
 
