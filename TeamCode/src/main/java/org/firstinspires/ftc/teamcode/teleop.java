@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -74,7 +75,12 @@ public class teleop extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotor elevator = null;
-
+    private Servo grabber = null;
+    static final double MAX_POS     =  0.6;     // Maximum rotational position
+    static final double MIN_POS     =  0.3;     // Minimum rotational position
+    double  grabber_position = MIN_POS; // Start at halfway position
+boolean open = true;
+boolean pushed = false;
     @Override
     public void runOpMode() {
 
@@ -85,7 +91,7 @@ public class teleop extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotorSimple.class, "motor3");
         rightBackDrive = hardwareMap.get(DcMotor.class, "motor2");
         elevator  = hardwareMap.get(DcMotor.class, "elevator");
-
+        grabber = hardwareMap.get(Servo.class, "grabber");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
         // ########################################################################################
@@ -113,8 +119,8 @@ public class teleop extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y/2.;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x/2.;
+            double axial   = gamepad1.left_stick_y/2.;  // Note: pushing stick forward gives negative value
+            double lateral =  -gamepad1.left_stick_x/2.;
             double yaw     =  gamepad1.right_stick_x/2.;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -159,16 +165,27 @@ public class teleop extends LinearOpMode {
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
-            if (gamepad1.right_bumper && !gamepad1.left_bumper) {
-                elevatorPower = 0.5;
+            if (gamepad1.left_trigger > 0  && gamepad1.right_trigger == 0) {
+                elevatorPower = -0.5;
             }
-            else if (gamepad1.left_bumper && !gamepad1.right_bumper){
-                elevatorPower = -1;
+            else if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0){
+                elevatorPower = gamepad1.right_trigger;
             }
             else {
                 elevatorPower = 0;
             }
             elevator.setPower(elevatorPower);
+            if ((gamepad1.right_bumper || gamepad1.left_bumper) && !pushed) {
+                pushed = true;
+                if (open) {grabber.setPosition(MAX_POS);
+                    open = false;}
+                else{grabber.setPosition(MIN_POS);
+                    open = true;}
+            }
+else {
+                pushed = false;
+            }
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
