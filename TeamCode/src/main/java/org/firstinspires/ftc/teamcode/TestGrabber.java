@@ -57,16 +57,19 @@ public class TestGrabber extends LinearOpMode {
     static final double MIN_POS     =  0.3;     // Minimum rotational position
 
     // Define class members
-    Servo   servo;
+    Servo   grabber;
     double  position = MIN_POS; // Start at halfway position
 
-
+    boolean open = true;
+    boolean pushed = false;
+int countopen = 0;
+int countclose = 0;
     @Override
     public void runOpMode() {
 
         // Connect to servo (Assume Robot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        servo = hardwareMap.get(Servo.class, "grabber");
+        grabber = hardwareMap.get(Servo.class, "grabber");
 
         // Wait for the start button
         telemetry.addData(">", "Press Start to scan Servo." );
@@ -76,20 +79,38 @@ public class TestGrabber extends LinearOpMode {
 
         // Scan servo till stop pressed.
         while(opModeIsActive()){
-            if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
-                servo.setPosition(MIN_POS);
+            /*
+            if (gamepad1.right_bumper && !gamepad1.left_bumper) {
+                grabber.setPosition(MIN_POS);
                 position = MIN_POS;
             }
-            else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0){
-                servo.setPosition(MAX_POS);
+            else if (gamepad1.left_bumper && !gamepad1.right_bumper){
+                grabber.setPosition(MAX_POS);
                 position = MAX_POS;
             }
+
+             */
             // slew the servo, according to the rampUp (direction) variable.
+            if ((gamepad1.right_bumper || gamepad1.left_bumper) && !pushed) {
+                pushed = true;
+                if (open) {grabber.setPosition(MAX_POS);
+                    position = MAX_POS;
+                    countclose ++;
+                    open = false;}
+                else{grabber.setPosition(MIN_POS);
+                    position = MIN_POS;
+                    countopen++;
+                    open = true;}
+            }
+            else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
+                pushed = false;
+            }
 
             //position = 0.6;
             // Display the current value
-            telemetry.addData("Servo Position", "%5.2f", position);
-            telemetry.addData(">", "Press Stop to end test." );
+            telemetry.addData("grabber Position", "%5.2f", position);
+            telemetry.addData("count open", "%d", countopen );
+            telemetry.addData("count close", "%d", countclose );
             telemetry.update();
 
             // Set the servo to the new position and pause;

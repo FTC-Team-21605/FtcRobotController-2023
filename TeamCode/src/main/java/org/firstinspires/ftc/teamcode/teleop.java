@@ -76,9 +76,11 @@ public class teleop extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor elevator = null;
     private Servo grabber = null;
-    static final double MAX_POS     =  0.6;     // Maximum rotational position
-    static final double MIN_POS     =  0.3;     // Minimum rotational position
-    double  grabber_position = MIN_POS; // Start at halfway position
+    static final double CLOSE_POS     =  0.6;     // Maximum rotational position
+    static final double OPEN_POS     =  0.3;     // Minimum rotational position
+    double  grabber_position = OPEN_POS; // Start at halfway position
+    int countopen = 0;
+    int countclose = 0;
 boolean open = true;
 boolean pushed = false;
     @Override
@@ -177,12 +179,12 @@ boolean pushed = false;
             elevator.setPower(elevatorPower);
             if ((gamepad1.right_bumper || gamepad1.left_bumper) && !pushed) {
                 pushed = true;
-                if (open) {grabber.setPosition(MAX_POS);
+                if (open) {grabber.setPosition(CLOSE_POS);
                     open = false;}
-                else{grabber.setPosition(MIN_POS);
+                else{grabber.setPosition(OPEN_POS);
                     open = true;}
             }
-else {
+            else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
                 pushed = false;
             }
 
