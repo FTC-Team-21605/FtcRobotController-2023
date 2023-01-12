@@ -121,8 +121,8 @@ boolean pushed = false;
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = gamepad1.left_stick_y/2.;  // Note: pushing stick forward gives negative value
-            double lateral =  -gamepad1.left_stick_x/2.;
+            double axial   = -gamepad1.left_stick_y/2.;  // Note: pushing stick forward gives negative value
+            double lateral =  gamepad1.left_stick_x/2.;
             double yaw     =  gamepad1.right_stick_x/2.;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
