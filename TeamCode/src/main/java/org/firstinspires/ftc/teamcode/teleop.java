@@ -83,6 +83,7 @@ public class teleop extends LinearOpMode {
     int countclose = 0;
 boolean open = true;
 boolean pushed = false;
+int elevatorposition_start = 0;
     @Override
     public void runOpMode() {
 
@@ -109,6 +110,8 @@ boolean pushed = false;
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         elevator.setDirection(DcMotor.Direction.FORWARD);
+        //elevator.setMode(DcMotor.RunMode.RESET_ENCODER);
+elevatorposition_start = elevator.getCurrentPosition();
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -172,22 +175,35 @@ boolean pushed = false;
             }
             else if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0){
                 elevatorPower = gamepad1.right_trigger;
+
+                if (gamepad1.a)
+                {
+                    if (elevator.getCurrentPosition() - elevatorposition_start > 100)
+                    {
+                        elevatorPower = 0;
+                    }
+                }
+
+
             }
             else {
                 elevatorPower = 0;
             }
             elevator.setPower(elevatorPower);
+            telemetry.addData("elevator position", "%d", elevator.getCurrentPosition() - elevatorposition_start);
             if ((gamepad1.right_bumper || gamepad1.left_bumper) && !pushed) {
                 pushed = true;
                 if (open) {grabber.setPosition(CLOSE_POS);
+                    grabber_position = CLOSE_POS;
                     open = false;}
                 else{grabber.setPosition(OPEN_POS);
+                    grabber_position = OPEN_POS;
                     open = true;}
             }
             else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
                 pushed = false;
             }
-
+            grabber.setPosition(grabber_position);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);

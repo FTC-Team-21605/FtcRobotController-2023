@@ -33,20 +33,19 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import java.util.List;
 import java.util.Objects;
 
@@ -76,9 +75,9 @@ import java.util.Objects;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Wallace autonomous", group="Robot")
+@Autonomous(name="Wallace autonomous cone 2", group="Robot")
 //@Disabled
-public class autonomous extends LinearOpMode {
+public class autonomous_our_cone extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor         leftFrontDrive   = null;
@@ -107,19 +106,26 @@ public class autonomous extends LinearOpMode {
     static final double     TURN_SPEED              = 0.5;
 
 //    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-/*
+
     private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
     //private static final String TFOD_MODEL_ASSET = "model_20221120_134403.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
 
-    private static final String[] LABELS = {
+ /*   private static final String[] LABELS = {
             "1 r",
             "2 t",
             "3 c"
     };
     */
 
+    private static final String[] LABELS = {
+            "1 c",
+            "2 r",
+            "3 t"
+    };
+
+/*
     private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
@@ -129,7 +135,7 @@ public class autonomous extends LinearOpMode {
             "2 Bulb",
             "3 Panel"
     };
-
+*/
     private static final String VUFORIA_KEY =
             "AWg6avH/////AAABmVwGucholUoCjMJvG6Nkzm9T5d2W4ip+kZpZPSLyNRxFFzzirrh9S2aguseh3zkQslKCyjyXTMJDAy4EpbEET+bdgXeAofWJSKMwFfq/qv8wImEVyaS2O15XsqX+uhfqT/jc8dVYvvaM53xe3MmI9yKfcAuneyXZvbxZRjAWTZQjgil1piyQoNA2/bH1ZaxNmEKrHrGOBeFYS27v4erDv7LrukYnTf5zI6oROPNHzFx5mzpUDja+0gi05NFw7Y2d7CyH9fdC1cXj+meHMGHxWVWVzAfOpi6jz9SHQgJsMmG48U7btY10cpBOTkj7PUj7bUxU9enuAT/6IuKR4PywKcIdkiMxVWnW7B0XAfvuuFgO";
     private VuforiaLocalizer vuforia;
@@ -242,13 +248,13 @@ public class autonomous extends LinearOpMode {
         encoderDrive(DRIVE_SPEED, 0.5, 0.5, 5.0);  // S1: Forward 47
         grabber.setPosition(CLOSE_POS);
        sleep(1000);
-        if (Objects.equals(object_id, "2 Bulb")) {
+        if (Objects.equals(object_id, "3 t")) {
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
             encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
             //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
             //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
-        } else if (Objects.equals(object_id, "1 Bolt")) {
+        } else if (Objects.equals(object_id, "2 r")) {
 //            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
@@ -297,7 +303,7 @@ public class autonomous extends LinearOpMode {
             //    telemetry.update();
             //  sleep(1000);  // pause to display final telemetry message.
         }
-        else if (Objects.equals(object_id, "3 Panel")) {
+        else if (Objects.equals(object_id, "1 c")) {
 //            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
