@@ -62,16 +62,27 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
     //private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
+//    private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
 //    private static final String TFOD_MODEL_ASSET = "model_20221120_134403.tflite";
+    // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
+private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
 
     private static final String[] LABELS = {
-            "1 c",
-            "2 r",
-            "3 t"
+           "1 Bolt",
+           "2 Bulb",
+            "3 Panel"
+   };
+
+
+/*    private static final String[] LABELS = {
+            "1 r",
+            "2 t",
+            "3 c"
     };
+    */
+
 /*    private static final String[] LABELS = {
             "1 Bolt",
             "2 Bulb",

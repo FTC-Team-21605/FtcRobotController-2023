@@ -70,7 +70,7 @@ public class IMUTurn extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     // The IMU sensor object
     IMU imu;
-    double yaw = -0.2;
+    double turnpower = -0.2;
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -94,8 +94,8 @@ public class IMUTurn extends LinearOpMode {
 
         // This sample expects the IMU to be in a REV Hub and named "imu".
         imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
@@ -111,10 +111,10 @@ public class IMUTurn extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double leftFrontPower  =  yaw;
-            double rightFrontPower =  - yaw;
-            double leftBackPower   =  yaw;
-            double rightBackPower  =  - yaw;
+            double leftFrontPower  =  turnpower;
+            double rightFrontPower =  - turnpower;
+            double leftBackPower   =  turnpower;
+            double rightBackPower  =  - turnpower;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -140,11 +140,11 @@ public class IMUTurn extends LinearOpMode {
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftFrontPower, rightFrontPower);
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             if (orientation.getYaw(AngleUnit.DEGREES) > 90) {
-                yaw = 0.2;
+                turnpower = 0.2;
                 imu.resetYaw();
             }
             if (orientation.getYaw(AngleUnit.DEGREES) < -90) {
-                yaw = -0.2;
+                turnpower = -0.2;
                 imu.resetYaw();
             }
 
