@@ -203,7 +203,7 @@ elevatorposition_start = elevator.getCurrentPosition();
             else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
                 pushed = false;
             }
-            grabber.setPosition(grabber_position);
+            //grabber.setPosition(grabber_position);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
