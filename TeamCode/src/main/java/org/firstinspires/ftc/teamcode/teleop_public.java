@@ -64,9 +64,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Wallace TeleOp", group="Linear Opmode")
+@TeleOp(name="Wallace TeleOp Public", group="Linear Opmode")
 //@Disabled
-public class teleop extends LinearOpMode {
+public class teleop_public extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -76,7 +76,7 @@ public class teleop extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor elevator = null;
     private Servo grabber = null;
-    static final double CLOSE_POS     =  0.7;     // Maximum rotational position
+    static final double CLOSE_POS     =  0.6;     // Maximum rotational position
     static final double OPEN_POS     =  0.3;     // Minimum rotational position
     double  grabber_position = OPEN_POS; // Start at halfway position
     int countopen = 0;
@@ -122,6 +122,15 @@ elevatorposition_start = elevator.getCurrentPosition();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
+            if ((gamepad2.right_bumper || gamepad2.left_bumper)) {
+                leftFrontDrive.setPower(0.);
+                rightFrontDrive.setPower(0.);
+                leftBackDrive.setPower(0.);
+                rightBackDrive.setPower(0.);
+                elevator.setPower(0.);
+                continue;
+
+            }
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y/2.;  // Note: pushing stick forward gives negative value
@@ -174,8 +183,8 @@ elevatorposition_start = elevator.getCurrentPosition();
                 elevatorPower = -0.5;
             }
             else if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0){
-                elevatorPower = gamepad1.right_trigger;
-
+             //   elevatorPower = gamepad1.right_trigger;
+                elevatorPower = 0;
                 if (gamepad1.a)
                 {
                     if (elevator.getCurrentPosition() - elevatorposition_start > 100)
