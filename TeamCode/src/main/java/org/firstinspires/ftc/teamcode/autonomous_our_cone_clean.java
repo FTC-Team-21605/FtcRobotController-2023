@@ -90,9 +90,6 @@ public class autonomous_our_cone_clean extends LinearOpMode {
  /* The inbuild IMU to find where we are heading */
     IMU imu;
 
-    static final double CLOSE_POS = 0.6;     // Closing position of grabber servo
-    double turnpower = -0.2;
-
     private ElapsedTime runtime = new ElapsedTime();
 
     // Set COUNTS_PER_INCH for your specific drive train.
@@ -102,19 +99,22 @@ public class autonomous_our_cone_clean extends LinearOpMode {
     static final double WHEEL_DIAMETER_INCHES = 4.0;     // We have 4'' mecanum wheels, likely they are not exactly 4'', the distance driven later is just approximate and we have to finetune for the actual distance driven
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
+/* motor power - we have 30 seconds and do not have to hurry. Doing it slow makes the turns easier */
     static final double DRIVE_SPEED = 0.2;
-    static final double TURN_SPEED = 0.5;
-
-
+    static final double TURN_SPEED = -0.2;
+    static final double CLOSE_POS = 0.6;     // Closing position of grabber servo
+static final long SLEEP_MS = 10; // ms to sleep between IMU refreshes
+/* This is our model we downloaded from the machine learning website */
     private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
 
-
+/* This is weird and we need to follow this up. Somehow the order is alphabetically, our circle should be "3 c" but doing this always found the triangle. This labelling here works but it is not what we really want to use. Incidentally the predefined model uses Bolt, Bulb and Panel, also in alphabetical order */
     private static final String[] LABELS = {
             "1 c",
             "2 r",
             "3 t"
     };
 
+    /* We had to make an account with Vuforia and download this key to use this */
     private static final String VUFORIA_KEY =
             "AWg6avH/////AAABmVwGucholUoCjMJvG6Nkzm9T5d2W4ip+kZpZPSLyNRxFFzzirrh9S2aguseh3zkQslKCyjyXTMJDAy4EpbEET+bdgXeAofWJSKMwFfq/qv8wImEVyaS2O15XsqX+uhfqT/jc8dVYvvaM53xe3MmI9yKfcAuneyXZvbxZRjAWTZQjgil1piyQoNA2/bH1ZaxNmEKrHrGOBeFYS27v4erDv7LrukYnTf5zI6oROPNHzFx5mzpUDja+0gi05NFw7Y2d7CyH9fdC1cXj+meHMGHxWVWVzAfOpi6jz9SHQgJsMmG48U7btY10cpBOTkj7PUj7bUxU9enuAT/6IuKR4PywKcIdkiMxVWnW7B0XAfvuuFgO";
     private VuforiaLocalizer vuforia;
@@ -147,7 +147,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         }
 
         /* Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.addData(">", "Press Play to start autonomous Wallace");
 
 
         // Initialize the drive system variables.
@@ -158,19 +158,20 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         grabber = hardwareMap.get(Servo.class, "grabber");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
+
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-
+/* set up our front motors to use the encoder, in principal we only need one for driving straight since we use the IMU for turning */
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+/* set up the IMU - our controler is vertical, perpendicular to the driving direction, yaw will give us the angle of our driving direction */
+        /* since these are all right angles we do not have to use rotation angles to initialize the IMU */
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
@@ -178,7 +179,6 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         // Now initialize the IMU with this mounting orientation
-        // Note: if you choose two conflicting directions, this initialization will cause a code exception.
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         // Send telemetry message to indicate successful Encoder reset
@@ -225,79 +225,76 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         imu.resetYaw();
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         encoderDrive(DRIVE_SPEED, 0.5, 0.5, 5.0);  // S1: Forward 47
-        grabber.setPosition(CLOSE_POS);
+        grabber.setPosition(CLOSE_POS); // close our grabber so we drag our cone along and are able to use it once teleop starts
         sleep(1000);
-        if (Objects.equals(object_id, "3 t")) {
-            // Step through each leg of the path,
-            // Note: Reverse movement is obtained by setting a negative distance (not speed)
-            encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-            //encoderDrive(TURN_SPEED, 12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-            //encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
-        } else if (Objects.equals(object_id, "2 r")) {
-//            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
+        if (Objects.equals(object_id, "3 t")) { // drive to loaction 2
+/* This just needs a straight drive (our robot is lined up with the wall to do this) */
+            encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47
+        } else if (Objects.equals(object_id, "2 r")) { // drive to location 1
+/* Here we need to make a left turn, drive a bit and then a right turn and drive a bit more */
+            telemetry.addData("found ", "%s", object_id);
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
-            //sleep(10000);
-            TurnLeft(turnpower);
+            TurnLeft(TURN_SPEED);
 
 
             while (orientation.getYaw(AngleUnit.DEGREES) < 80) {
-                sleep(10);
+                sleep(SLEEP_MS); // sleep a bit so we do not bog down the cpu
+                telemetry.addData("found ", "%s", object_id);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
                 orientation = imu.getRobotYawPitchRollAngles();
             }
             MotorsOff();
             encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
-            TurnRight(turnpower);
+            TurnRight(TURN_SPEED);
             while (orientation.getYaw(AngleUnit.DEGREES) > 10) {
-                sleep(10);
+                sleep(SLEEP_MS); // sleep a bit so we do not bog down the cpu
+                telemetry.addData("found ", "%s", object_id);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
                 orientation = imu.getRobotYawPitchRollAngles();
             }
             MotorsOff();
             encoderDrive(DRIVE_SPEED, 30, 30, 5.0);  // S1: Forward 47
-            //    telemetry.addData("Path", "Complete");
-            //    telemetry.update();
-            //  sleep(1000);  // pause to display final telemetry message.
-        } else if (Objects.equals(object_id, "1 c")) {
-//            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
+        } else if (Objects.equals(object_id, "1 c")) { // drive to location 3
+/* Here we need to make a right turn, drive a bit, make a left turn and drive a bit more */
+            telemetry.addData("found ", "%s", object_id);
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
-            //sleep(10000);
-            TurnRight(turnpower);
-
+            TurnRight(TURN_SPEED);
+/* turn until the angle is -80 degrees. With the time lags we are around -90 when the robot stops */
             while (orientation.getYaw(AngleUnit.DEGREES) > -80) {
-                sleep(10);
+                sleep(SLEEP_MS); // sleep a bit so we do not bog down the cpu
+                telemetry.addData("found ", "%s", object_id);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
                 orientation = imu.getRobotYawPitchRollAngles();
             }
             MotorsOff();
             encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
-            TurnLeft(turnpower);
+            TurnLeft(TURN_SPEED);
             while (orientation.getYaw(AngleUnit.DEGREES) < -10) {
-                sleep(10);
+                sleep(SLEEP_MS); // sleep a bit so we do not bog down the cpu
+                telemetry.addData("found ", "%s", object_id);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
                 orientation = imu.getRobotYawPitchRollAngles();
             }
             MotorsOff();
             encoderDrive(DRIVE_SPEED, 30, 30, 5.0);  // S1: Forward 47
-            //    telemetry.addData("Path", "Complete");
-            //    telemetry.update();
-            //  sleep(1000);  // pause to display final telemetry message.
+            telemetry.addData("we have arrived at ", "%s", object_id);
+                telemetry.update();
+              sleep(1000);  // pause to display final telemetry message.
         }
     }
 
     /*
-     *  Method to perform a relative move, based on encoder counts.
-     *  Encoders are not reset as the move is based on the current position.
-     *  Move will stop if any of three conditions occur:
-     *  1) Move gets to the desired position
-     *  2) Move runs out of time
-     *  3) Driver stops the opmode running.
+     * These are just convenience methods to reduce the number of duplicated lines of code
+     * The first one just stops the robot (turns off all motors)
+     * The second one starts turning the robot to the left
+     * The third one starts a turn to the right
+     * The forth one set the motor powers to initiate a left/right turn depending on the first argument
      */
     public void MotorsOff() {
         leftFrontDrive.setPower(0);
@@ -331,6 +328,14 @@ public class autonomous_our_cone_clean extends LinearOpMode {
 
     }
 
+    /*
+     *  Method to perform a relative move, based on encoder counts.
+     *  Encoders are not reset as the move is based on the current position.
+     *  Move will stop if any of three conditions occur:
+     *  1) Move gets to the desired position
+     *  2) Move runs out of time
+     *  3) Driver stops the opmode running.
+     */
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {
@@ -378,10 +383,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             }
 
             // Stop all motion;
-            leftFrontDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            leftBackDrive.setPower(0);
-            rightBackDrive.setPower(0);
+            MotorsOff();
 
             // Turn off RUN_TO_POSITION
             leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -417,8 +419,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
-        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        // We program with Android studio, so this is what we have to use
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 }
