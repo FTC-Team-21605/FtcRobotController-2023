@@ -52,62 +52,61 @@ import java.util.Objects;
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
- *
+ * <p>
  * The code REQUIRES that you DO have encoders on the wheels,
- *   otherwise you would use: RobotAutoDriveByTime;
- *
- *  This code ALSO requires that the drive Motors have been configured such that a positive
- *  power command moves them forward, and causes the encoders to count UP.
- *
- *   The desired path in this example is:
- *   - Drive forward for 48 inches
- *   - Spin right for 12 Inches
- *   - Drive Backward for 24 inches
- *   - Stop and close the claw.
- *
- *  The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
- *  that performs the actual movement.
- *  This method assumes that each movement is relative to the last stopping place.
- *  There are other ways to perform encoder based moves, but this method is probably the simplest.
- *  This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
- *
+ * otherwise you would use: RobotAutoDriveByTime;
+ * <p>
+ * This code ALSO requires that the drive Motors have been configured such that a positive
+ * power command moves them forward, and causes the encoders to count UP.
+ * <p>
+ * The desired path in this example is:
+ * - Drive forward for 48 inches
+ * - Spin right for 12 Inches
+ * - Drive Backward for 24 inches
+ * - Stop and close the claw.
+ * <p>
+ * The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
+ * that performs the actual movement.
+ * This method assumes that each movement is relative to the last stopping place.
+ * There are other ways to perform encoder based moves, but this method is probably the simplest.
+ * This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
+ * <p>
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Wallace autonomous our cone clean", group="Robot")
+@Autonomous(name = "Wallace autonomous our cone clean", group = "Robot")
 //@Disabled
 public class autonomous_our_cone_clean extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DcMotor         leftFrontDrive   = null;
-    private DcMotor         rightFrontDrive  = null;
-    private DcMotorSimple         leftBackDrive   = null;
-    private DcMotor         rightBackDrive  = null;
+    /* First our motors */
+    private DcMotor leftFrontDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotorSimple leftBackDrive = null; // the left back motor is powered by a spark controler which does not have a rotation sensor input - so it is DcMotorSimple
+    private DcMotor rightBackDrive = null;
+    /* one servo to grab the cone */
     private Servo grabber = null;
-    static final double CLOSE_POS     =  0.6;     // Maximum rotational position
+ /* The inbuild IMU to find where we are heading */
     IMU imu;
+
+    static final double CLOSE_POS = 0.6;     // Closing position of grabber servo
     double turnpower = -0.2;
 
-    private ElapsedTime     runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
-    // Calculate the COUNTS_PER_INCH for your specific drive train.
-    // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
-    // For external drive gearing, set DRIVE_GEAR_REDUCTION as needed.
-    // For example, use a value of 2.0 for a 12-tooth spur gear driving a 24-tooth spur gear.
-    // This is gearing DOWN for less speed and more torque.
-    // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
-    static final double     COUNTS_PER_MOTOR_REV    = 28 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 20.0 ;     // No External Gearing.
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-                                                      (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.2;
-    static final double     TURN_SPEED              = 0.5;
+    // Set COUNTS_PER_INCH for your specific drive train.
+/* We use Rev Motors with a combined x4 and x5 gear ratio (=20) */
+    static final double COUNTS_PER_MOTOR_REV = 28;    // Rev Motor Encoder from specs
+    static final double DRIVE_GEAR_REDUCTION = 20.0;     // x4 and x5 gear ratios
+    static final double WHEEL_DIAMETER_INCHES = 4.0;     // We have 4'' mecanum wheels, likely they are not exactly 4'', the distance driven later is just approximate and we have to finetune for the actual distance driven
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double DRIVE_SPEED = 0.2;
+    static final double TURN_SPEED = 0.5;
 
 
     private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
-
 
 
     private static final String[] LABELS = {
@@ -116,7 +115,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             "3 t"
     };
 
-   private static final String VUFORIA_KEY =
+    private static final String VUFORIA_KEY =
             "AWg6avH/////AAABmVwGucholUoCjMJvG6Nkzm9T5d2W4ip+kZpZPSLyNRxFFzzirrh9S2aguseh3zkQslKCyjyXTMJDAy4EpbEET+bdgXeAofWJSKMwFfq/qv8wImEVyaS2O15XsqX+uhfqT/jc8dVYvvaM53xe3MmI9yKfcAuneyXZvbxZRjAWTZQjgil1piyQoNA2/bH1ZaxNmEKrHrGOBeFYS27v4erDv7LrukYnTf5zI6oROPNHzFx5mzpUDja+0gi05NFw7Y2d7CyH9fdC1cXj+meHMGHxWVWVzAfOpi6jz9SHQgJsMmG48U7btY10cpBOTkj7PUj7bUxU9enuAT/6IuKR4PywKcIdkiMxVWnW7B0XAfvuuFgO";
     private VuforiaLocalizer vuforia;
 
@@ -227,7 +226,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         encoderDrive(DRIVE_SPEED, 0.5, 0.5, 5.0);  // S1: Forward 47
         grabber.setPosition(CLOSE_POS);
-       sleep(1000);
+        sleep(1000);
         if (Objects.equals(object_id, "3 t")) {
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
@@ -238,7 +237,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
 //            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
-           //sleep(10000);
+            //sleep(10000);
             TurnLeft(turnpower);
 
 
@@ -249,9 +248,9 @@ public class autonomous_our_cone_clean extends LinearOpMode {
                 orientation = imu.getRobotYawPitchRollAngles();
             }
             MotorsOff();
-             encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
-         TurnRight(turnpower);
-             while (orientation.getYaw(AngleUnit.DEGREES) > 10) {
+            encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
+            TurnRight(turnpower);
+            while (orientation.getYaw(AngleUnit.DEGREES) > 10) {
                 sleep(10);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
@@ -262,8 +261,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             //    telemetry.addData("Path", "Complete");
             //    telemetry.update();
             //  sleep(1000);  // pause to display final telemetry message.
-        }
-        else if (Objects.equals(object_id, "1 c")) {
+        } else if (Objects.equals(object_id, "1 c")) {
 //            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
@@ -277,9 +275,9 @@ public class autonomous_our_cone_clean extends LinearOpMode {
                 orientation = imu.getRobotYawPitchRollAngles();
             }
             MotorsOff();
-             encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
- TurnLeft( turnpower);
-             while (orientation.getYaw(AngleUnit.DEGREES) < -10) {
+            encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
+            TurnLeft(turnpower);
+            while (orientation.getYaw(AngleUnit.DEGREES) < -10) {
                 sleep(10);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
@@ -292,6 +290,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             //  sleep(1000);  // pause to display final telemetry message.
         }
     }
+
     /*
      *  Method to perform a relative move, based on encoder counts.
      *  Encoders are not reset as the move is based on the current position.
@@ -300,8 +299,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
      *  2) Move runs out of time
      *  3) Driver stops the opmode running.
      */
-    public void MotorsOff()
-    {
+    public void MotorsOff() {
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
@@ -309,15 +307,19 @@ public class autonomous_our_cone_clean extends LinearOpMode {
 
     }
 
-    public void TurnLeft(double turnpower)
-    {Turn(true, turnpower);}
-    public void TurnRight(double turnpower)
-    {Turn(false, turnpower);}
-    public void Turn(boolean left, double turnpower){
-        if (left){
+    public void TurnLeft(double turnpower) {
+        Turn(true, turnpower);
+    }
+
+    public void TurnRight(double turnpower) {
+        Turn(false, turnpower);
+    }
+
+    public void Turn(boolean left, double turnpower) {
+        if (left) {
             turnpower = -turnpower;
         }
-       double leftFrontPower = turnpower;
+        double leftFrontPower = turnpower;
         double rightFrontPower = -turnpower;
         double leftBackPower = turnpower;
         double rightBackPower = -turnpower;
@@ -328,6 +330,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
 
 
     }
+
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {
@@ -335,14 +338,14 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         int newRightTarget;
         telemetry.addData("lfin", "%.0f %.0f / %.0f", speed, leftInches, rightInches);
         telemetry.update();
-     //   sleep(10000);  // pause to display final telemetry message.
+        //   sleep(10000);  // pause to display final telemetry message.
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftTarget = leftFrontDrive.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-            newRightTarget = rightFrontDrive.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            newLeftTarget = leftFrontDrive.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+            newRightTarget = rightFrontDrive.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
             leftFrontDrive.setTargetPosition(newLeftTarget);
             rightFrontDrive.setTargetPosition(newRightTarget);
 
@@ -364,13 +367,13 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
-                   (runtime.seconds() < timeoutS) &&
-                   (leftFrontDrive.isBusy() && rightFrontDrive.isBusy())) {
+                    (runtime.seconds() < timeoutS) &&
+                    (leftFrontDrive.isBusy() && rightFrontDrive.isBusy())) {
 
                 // Display it for the driver.
-                telemetry.addData("Running to",  " %7d :%7d", newLeftTarget,  newRightTarget);
-                telemetry.addData("Currently at",  " at %7d :%7d",
-                                            leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition());
+                telemetry.addData("Running to", " %7d :%7d", newLeftTarget, newRightTarget);
+                telemetry.addData("Currently at", " at %7d :%7d",
+                        leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition());
                 telemetry.update();
             }
 
