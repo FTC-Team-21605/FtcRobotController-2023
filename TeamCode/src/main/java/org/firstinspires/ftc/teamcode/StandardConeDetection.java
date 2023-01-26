@@ -50,7 +50,7 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Standard Cone Recognition", group = "Concept")
+@TeleOp(name = "Test: Standard Cone Recognition", group = "ZTest")
 //@Disabled
 public class StandardConeDetection extends LinearOpMode {
 

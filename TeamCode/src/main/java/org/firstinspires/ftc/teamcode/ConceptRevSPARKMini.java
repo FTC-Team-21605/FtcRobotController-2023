@@ -48,14 +48,14 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="REV SPARKmini Simple Drive Example", group="Concept")
+@TeleOp(name="Test: Spark Controler", group="ZTest")
 //@Disabled
 public class ConceptRevSPARKMini extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotorSimple leftDrive = null;
-    private DcMotorSimple rightDrive = null;
+    private DcMotorSimple leftBackDrive = null;
+
 
     @Override
     public void runOpMode() {
@@ -65,13 +65,11 @@ public class ConceptRevSPARKMini extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotorSimple.class, "leftdrive");
-        rightDrive = hardwareMap.get(DcMotorSimple.class, "rightdrive");
+        leftBackDrive  = hardwareMap.get(DcMotorSimple.class, "motor3");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backward when connected directly to the battery
-        leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -82,7 +80,6 @@ public class ConceptRevSPARKMini extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
-            double rightPower;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -92,7 +89,6 @@ public class ConceptRevSPARKMini extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;
             double turn  =  gamepad1.right_stick_x;
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
@@ -100,12 +96,11 @@ public class ConceptRevSPARKMini extends LinearOpMode {
             // rightPower = -gamepad1.right_stick_y ;
 
             // Send calculated power to wheels
-            leftDrive.setPower(leftPower);
-            rightDrive.setPower(rightPower);
+            leftBackDrive.setPower(leftPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Motors", "Spark Pwr (%.2f)", leftPower);
             telemetry.update();
         }
     }

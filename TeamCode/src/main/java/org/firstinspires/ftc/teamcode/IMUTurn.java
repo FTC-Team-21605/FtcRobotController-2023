@@ -58,7 +58,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="IMU Turn", group="Linear Opmode")
+@TeleOp(name="Test: IMU Turn", group="ZTest")
 //@Disabled
 public class IMUTurn extends LinearOpMode {
 

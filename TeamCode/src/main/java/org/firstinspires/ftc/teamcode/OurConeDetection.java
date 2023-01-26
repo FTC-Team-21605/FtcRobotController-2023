@@ -50,7 +50,7 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Our Cone Detection Webcam", group = "Concept")
+@TeleOp(name = "Test: Our Cone Detection Webcam", group = "ZTest")
 //@Disabled
 public class OurConeDetection extends LinearOpMode {
 
