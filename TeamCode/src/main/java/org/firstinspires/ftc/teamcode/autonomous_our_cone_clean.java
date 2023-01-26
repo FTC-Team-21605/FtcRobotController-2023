@@ -105,7 +105,6 @@ public class autonomous_our_cone_clean extends LinearOpMode {
     static final double     DRIVE_SPEED             = 0.2;
     static final double     TURN_SPEED              = 0.5;
 
-//    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
 
     private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
 
@@ -240,14 +239,8 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
            //sleep(10000);
-            double leftFrontPower = -turnpower;
-            double rightFrontPower = turnpower;
-            double leftBackPower = -turnpower;
-            double rightBackPower = turnpower;
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+            TurnLeft(turnpower);
+
 
             while (orientation.getYaw(AngleUnit.DEGREES) < 80) {
                 sleep(10);
@@ -255,21 +248,10 @@ public class autonomous_our_cone_clean extends LinearOpMode {
                 telemetry.update();
                 orientation = imu.getRobotYawPitchRollAngles();
             }
-            leftFrontDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            leftBackDrive.setPower(0);
-            rightBackDrive.setPower(0);
-           encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
-            leftFrontPower = turnpower;
-            rightFrontPower = -turnpower;
-            leftBackPower = turnpower;
-            rightBackPower = -turnpower;
-//            imu.resetYaw();
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-            while (orientation.getYaw(AngleUnit.DEGREES) > 10) {
+            MotorsOff();
+             encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
+         TurnRight(turnpower);
+             while (orientation.getYaw(AngleUnit.DEGREES) > 10) {
                 sleep(10);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
@@ -286,14 +268,7 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
             //sleep(10000);
-            double leftFrontPower = turnpower;
-            double rightFrontPower = -turnpower;
-            double leftBackPower = turnpower;
-            double rightBackPower = -turnpower;
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+            TurnRight(turnpower);
 
             while (orientation.getYaw(AngleUnit.DEGREES) > -80) {
                 sleep(10);
@@ -303,16 +278,8 @@ public class autonomous_our_cone_clean extends LinearOpMode {
             }
             MotorsOff();
              encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
-            leftFrontPower = -turnpower;
-            rightFrontPower = turnpower;
-            leftBackPower = -turnpower;
-            rightBackPower = turnpower;
-//            imu.resetYaw();
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-            while (orientation.getYaw(AngleUnit.DEGREES) < -10) {
+ TurnLeft( turnpower);
+             while (orientation.getYaw(AngleUnit.DEGREES) < -10) {
                 sleep(10);
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                 telemetry.update();
@@ -341,14 +308,19 @@ public class autonomous_our_cone_clean extends LinearOpMode {
         rightBackDrive.setPower(0);
 
     }
+
+    public void TurnLeft(double turnpower)
+    {Turn(true, turnpower);}
+    public void TurnRight(double turnpower)
+    {Turn(false, turnpower);}
     public void Turn(boolean left, double turnpower){
         if (left){
             turnpower = -turnpower;
         }
-       double leftFrontPower = -turnpower;
-        double rightFrontPower = turnpower;
-        double leftBackPower = -turnpower;
-        double rightBackPower = turnpower;
+       double leftFrontPower = turnpower;
+        double rightFrontPower = -turnpower;
+        double leftBackPower = turnpower;
+        double rightBackPower = -turnpower;
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);

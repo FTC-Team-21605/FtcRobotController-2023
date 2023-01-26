@@ -76,7 +76,7 @@ public class teleop extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor elevator = null;
     private Servo grabber = null;
-    static final double CLOSE_POS     =  0.7;     // Maximum rotational position
+    static final double CLOSE_POS     =  0.65;     // Maximum rotational position
     static final double OPEN_POS     =  0.3;     // Minimum rotational position
     double  grabber_position = OPEN_POS; // Start at halfway position
     int countopen = 0;
@@ -203,7 +203,7 @@ elevatorposition_start = elevator.getCurrentPosition();
             else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
                 pushed = false;
             }
-            //grabber.setPosition(grabber_position);
+            grabber.setPosition(grabber_position);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
