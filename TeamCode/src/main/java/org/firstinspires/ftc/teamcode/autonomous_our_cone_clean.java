@@ -87,27 +87,27 @@ public class autonomous_our_cone_clean extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     /* one servo to grab the cone */
     private Servo grabber = null;
- /* The inbuild IMU to find where we are heading */
+    /* The inbuild IMU to find where we are heading */
     IMU imu;
 
     private ElapsedTime runtime = new ElapsedTime();
 
     // Set COUNTS_PER_INCH for your specific drive train.
-/* We use Rev Motors with a combined x4 and x5 gear ratio (=20) */
+    /* We use Rev Motors with a combined x4 and x5 gear ratio (=20) */
     static final double COUNTS_PER_MOTOR_REV = 28;    // Rev Motor Encoder from specs
     static final double DRIVE_GEAR_REDUCTION = 20.0;     // x4 and x5 gear ratios
     static final double WHEEL_DIAMETER_INCHES = 4.0;     // We have 4'' mecanum wheels, likely they are not exactly 4'', the distance driven later is just approximate and we have to finetune for the actual distance driven
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-/* motor power - we have 30 seconds and do not have to hurry. Doing it slow makes the turns easier */
+    /* motor power - we have 30 seconds and do not have to hurry. Doing it slow makes the turns easier */
     static final double DRIVE_SPEED = 0.2;
     static final double TURN_SPEED = -0.2;
     static final double CLOSE_POS = 0.6;     // Closing position of grabber servo
-static final long SLEEP_MS = 10; // ms to sleep between IMU refreshes
-/* This is our model we downloaded from the machine learning website */
+    static final long SLEEP_MS = 10; // ms to sleep between IMU refreshes
+    /* This is our model we downloaded from the machine learning website */
     private static final String TFOD_MODEL_ASSET = "model_20230106_083116_cone_version_2.tflite";
 
-/* This is weird and we need to follow this up. Somehow the order is alphabetically, our circle should be "3 c" but doing this always found the triangle. This labelling here works but it is not what we really want to use. Incidentally the predefined model uses Bolt, Bulb and Panel, also in alphabetical order */
+    /* This is weird and we need to follow this up. Somehow the order is alphabetically, our circle should be "3 c" but doing this always found the triangle. This labelling here works but it is not what we really want to use. Incidentally the predefined model uses Bolt, Bulb and Panel, also in alphabetical order */
     private static final String[] LABELS = {
             "1 c",
             "2 r",
@@ -163,14 +163,14 @@ static final long SLEEP_MS = 10; // ms to sleep between IMU refreshes
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-/* set up our front motors to use the encoder, in principal we only need one for driving straight since we use the IMU for turning */
+        /* set up our front motors to use the encoder, in principal we only need one for driving straight since we use the IMU for turning */
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-/* set up the IMU - our controler is vertical, perpendicular to the driving direction, yaw will give us the angle of our driving direction */
+        /* set up the IMU - our controler is vertical, perpendicular to the driving direction, yaw will give us the angle of our driving direction */
         /* since these are all right angles we do not have to use rotation angles to initialize the IMU */
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
@@ -228,10 +228,10 @@ static final long SLEEP_MS = 10; // ms to sleep between IMU refreshes
         grabber.setPosition(CLOSE_POS); // close our grabber so we drag our cone along and are able to use it once teleop starts
         sleep(1000);
         if (Objects.equals(object_id, "3 t")) { // drive to loaction 2
-/* This just needs a straight drive (our robot is lined up with the wall to do this) */
+            /* This just needs a straight drive (our robot is lined up with the wall to do this) */
             encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47
         } else if (Objects.equals(object_id, "2 r")) { // drive to location 1
-/* Here we need to make a left turn, drive a bit and then a right turn and drive a bit more */
+            /* Here we need to make a left turn, drive a bit and then a right turn and drive a bit more */
             telemetry.addData("found ", "%s", object_id);
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
@@ -258,12 +258,12 @@ static final long SLEEP_MS = 10; // ms to sleep between IMU refreshes
             MotorsOff();
             encoderDrive(DRIVE_SPEED, 30, 30, 5.0);  // S1: Forward 47
         } else if (Objects.equals(object_id, "1 c")) { // drive to location 3
-/* Here we need to make a right turn, drive a bit, make a left turn and drive a bit more */
+            /* Here we need to make a right turn, drive a bit, make a left turn and drive a bit more */
             telemetry.addData("found ", "%s", object_id);
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
             telemetry.update();
             TurnRight(TURN_SPEED);
-/* turn until the angle is -80 degrees. With the time lags we are around -90 when the robot stops */
+            /* turn until the angle is -80 degrees. With the time lags we are around -90 when the robot stops */
             while (orientation.getYaw(AngleUnit.DEGREES) > -80) {
                 sleep(SLEEP_MS); // sleep a bit so we do not bog down the cpu
                 telemetry.addData("found ", "%s", object_id);
@@ -284,8 +284,8 @@ static final long SLEEP_MS = 10; // ms to sleep between IMU refreshes
             MotorsOff();
             encoderDrive(DRIVE_SPEED, 30, 30, 5.0);  // S1: Forward 47
             telemetry.addData("we have arrived at ", "%s", object_id);
-                telemetry.update();
-              sleep(1000);  // pause to display final telemetry message.
+            telemetry.update();
+            sleep(1000);  // pause to display final telemetry message.
         }
     }
 

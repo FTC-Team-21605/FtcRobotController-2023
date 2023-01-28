@@ -80,7 +80,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
     static final double OPEN_POS = 0.37;     // Minimum rotational position
     int countopen = 0;
     int countclose = 0;
-// elevator variables
+    // elevator variables
     int elevatorposition_start = 0;
     static final int LOW_POLE = 330;
     static final int MEDIUM_POLE = 500;
@@ -163,7 +163,6 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
             }
 
 
-
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
@@ -217,7 +216,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                 elevator_moveto = -1000;
 
             } else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0) {
-                elevatorPower = Math.max(-0.5,-gamepad1.left_trigger);
+                elevatorPower = Math.max(-0.5, -gamepad1.left_trigger);
                 elevator_moveto = -1000;
             } else {
                 if (elevator_moveto < 0) {
@@ -231,7 +230,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                         elevator_moveto = -1000;
                     }
                 } else {
-                    if (current_elevator_position <= (elevator_moveto+move_down_offset)) {
+                    if (current_elevator_position <= (elevator_moveto + move_down_offset)) {
                         elevatorPower = 0;
                         elevator_moveto = -1000;
                     }
@@ -242,7 +241,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
             }
 
             elevator.setPower(elevatorPower);//rightDrive.setPower(rightPower);
-          telemetry.addData("elevator position", "%d", current_elevator_position);
+            telemetry.addData("elevator position", "%d", current_elevator_position);
             if ((gamepad1.right_bumper || gamepad1.left_bumper) && !pushed) {
                 pushed = true;
                 if (open) {
