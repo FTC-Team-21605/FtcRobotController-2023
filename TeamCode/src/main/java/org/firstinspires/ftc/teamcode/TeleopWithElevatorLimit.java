@@ -76,13 +76,10 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor elevator = null;
     private Servo grabber = null;
-    static final double CLOSE_POS = 0.65;     // Maximum rotational position
-    static final double OPEN_POS = 0.3;     // Minimum rotational position
-    double grabber_position = OPEN_POS; // Start at halfway position
+    static final double CLOSE_POS = 0.57;     // Maximum rotational position
+    static final double OPEN_POS = 0.37;     // Minimum rotational position
     int countopen = 0;
     int countclose = 0;
-    boolean open = true;
-    boolean pushed = false;
 // elevator variables
     int elevatorposition_start = 0;
     static final int LOW_POLE = 330;
@@ -130,6 +127,10 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
         boolean move_up = true;
         int move_down_offset = 0;
 
+        boolean open = false;
+        boolean pushed = false;
+        double grabber_position = CLOSE_POS; // Start at halfway position
+        grabber.setPosition(grabber_position);
         waitForStart();
         runtime.reset();
 
@@ -256,11 +257,12 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
             } else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
                 pushed = false;
             }
-            grabber.setPosition(grabber_position);
+            //grabber.setPosition(grabber_position);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Grabber Position", "%4.2f", grabber_position);
             telemetry.update();
         }
     }

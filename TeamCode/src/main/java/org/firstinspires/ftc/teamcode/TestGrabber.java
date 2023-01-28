@@ -53,8 +53,8 @@ public class TestGrabber extends LinearOpMode {
 
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
     static final int    CYCLE_MS    =   200;     // period of each cycle
-    static final double MAX_POS     =  0.6;     // Maximum rotational position
-    static final double MIN_POS     =  0.3;     // Minimum rotational position
+    static final double MAX_POS     =  0.57;     // Maximum rotational position
+    static final double MIN_POS     =  0.37;     // Minimum rotational position
 
     // Define class members
     Servo   grabber;
