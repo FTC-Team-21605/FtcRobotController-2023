@@ -31,37 +31,29 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
+ *
  * This OpMode executes a basic Tank Drive Teleop for a two wheeled robot using two REV SPARKminis.
  * To use this example, connect two REV SPARKminis into servo ports on the Expansion Hub. On the
  * robot configuration, use the drop down list under 'Servos' to select 'REV SPARKmini Controller'
  * and name them 'left_drive' and 'right_drive'.
- * <p>
+ *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "Test: Elevator", group = "ZTest")
+@TeleOp(name="Test: ElevatorReset", group="ZTest")
 //@Disabled
-public class Elevator extends LinearOpMode {
+public class ElevatorReset extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor elevator = null;
     //private DcMotorSimple rightDrive = null;
-    static final int LOW_POLE = 330;
-    static final int MEDIUM_POLE = 500;
-    static final int HIGH_POLE = 930;
-    static final double LOW_POLE_SPEED = 0.5;
-    static final double MEDIUM_POLE_SPEED = 0.8;
-    static final double HIGH_POLE_SPEED = 1.;
-
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -70,18 +62,14 @@ public class Elevator extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator  = hardwareMap.get(DcMotor.class, "elevator");
         //rightDrive = hardwareMap.get(DcMotorSimple.class, "rightdrive");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backward when connected directly to the battery
         elevator.setDirection(DcMotor.Direction.FORWARD);
         //rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        int elevatorposition_start = elevator.getCurrentPosition();
-        int elevator_moveto = elevatorposition_start;
-        double elevator_fixed_speed = 0;
         double elevatorPower = 0;
-        boolean move_up = true;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -91,77 +79,18 @@ public class Elevator extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
 
-            int current_elevator_position = elevator.getCurrentPosition() - elevatorposition_start;
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            if (gamepad1.a) {
-                elevator_moveto = LOW_POLE;
-                if (current_elevator_position < LOW_POLE) {
-                    elevatorPower = LOW_POLE_SPEED;
-                    move_up = true;
-                } else if (current_elevator_position > LOW_POLE) {
-                    move_up = false;
-                    elevatorPower = -LOW_POLE_SPEED;
-                } else {
-                    elevatorPower = 0;
-                }
-            }
-            if (gamepad1.b) {
-                elevator_moveto = MEDIUM_POLE;
-                if (current_elevator_position < MEDIUM_POLE) {
-                    elevatorPower = MEDIUM_POLE_SPEED;
-                    move_up = true;
-                } else if (current_elevator_position > MEDIUM_POLE) {
-                    move_up = false;
-                    elevatorPower = -MEDIUM_POLE_SPEED;
-                } else {
-                    elevatorPower = 0;
-                }
-            }
-            if (gamepad1.y) {
-                elevator_moveto = HIGH_POLE;
-                if (current_elevator_position < HIGH_POLE) {
-                    elevatorPower = HIGH_POLE_SPEED;
-                    move_up = true;
-                } else if (current_elevator_position > HIGH_POLE) {
-                    move_up = false;
-                    elevatorPower = -HIGH_POLE_SPEED;
-                } else {
-                    elevatorPower = 0;
-                }
-            }
-
             if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
                 elevatorPower = gamepad1.right_trigger;
-                elevator_moveto = -1000;
 
-            } else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0) {
+            }
+            else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0){
                 elevatorPower = -0.5;
-                elevator_moveto = -1000;
-            } else {
-                if (elevator_moveto < 0) {
+            }
+            else {
                     elevatorPower = 0;
-                }
+
             }
-            if (elevator_moveto > 0) {
-                if (move_up) {
-                    if (current_elevator_position >= elevator_moveto) {
-                        elevatorPower = 0;
-                        elevator_moveto = -1000;
-                    }
-                } else {
-                    if (current_elevator_position <= elevator_moveto) {
-                        elevatorPower = 0;
-                        elevator_moveto = -1000;
-                    }
-                }
-            }
-            if (elevatorPower < 0 && current_elevator_position <= 0) {
-                elevatorPower = 0;
-            }
+
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
             // elevatorPower  = -gamepad1.left_stick_y ;
