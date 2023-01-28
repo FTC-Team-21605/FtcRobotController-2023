@@ -84,7 +84,7 @@ public class ElevatorReset extends LinearOpMode {
 
             }
             else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0){
-                elevatorPower = -0.5;
+                elevatorPower = Math.max(-gamepad1.left_trigger,-0.5);
             }
             else {
                     elevatorPower = 0;

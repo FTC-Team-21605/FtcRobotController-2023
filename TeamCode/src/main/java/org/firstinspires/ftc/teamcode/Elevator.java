@@ -71,17 +71,14 @@ public class Elevator extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        //rightDrive = hardwareMap.get(DcMotorSimple.class, "rightdrive");
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backward when connected directly to the battery
         elevator.setDirection(DcMotor.Direction.FORWARD);
-        //rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         int elevatorposition_start = elevator.getCurrentPosition();
         int elevator_moveto = elevatorposition_start;
         double elevator_fixed_speed = 0;
         double elevatorPower = 0;
         boolean move_up = true;
+        int move_down_offset = 0;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -92,12 +89,7 @@ public class Elevator extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
 
             int current_elevator_position = elevator.getCurrentPosition() - elevatorposition_start;
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            if (gamepad1.a) {
+             if (gamepad1.a) {
                 elevator_moveto = LOW_POLE;
                 if (current_elevator_position < LOW_POLE) {
                     elevatorPower = LOW_POLE_SPEED;
@@ -105,6 +97,7 @@ public class Elevator extends LinearOpMode {
                 } else if (current_elevator_position > LOW_POLE) {
                     move_up = false;
                     elevatorPower = -LOW_POLE_SPEED;
+                    move_down_offset = 50;
                 } else {
                     elevatorPower = 0;
                 }
@@ -117,6 +110,7 @@ public class Elevator extends LinearOpMode {
                 } else if (current_elevator_position > MEDIUM_POLE) {
                     move_up = false;
                     elevatorPower = -MEDIUM_POLE_SPEED;
+                    move_down_offset = 125;
                 } else {
                     elevatorPower = 0;
                 }
@@ -129,6 +123,7 @@ public class Elevator extends LinearOpMode {
                 } else if (current_elevator_position > HIGH_POLE) {
                     move_up = false;
                     elevatorPower = -HIGH_POLE_SPEED;
+                    move_down_offset = 0;
                 } else {
                     elevatorPower = 0;
                 }
@@ -162,14 +157,8 @@ public class Elevator extends LinearOpMode {
             if (elevatorPower < 0 && current_elevator_position <= 0) {
                 elevatorPower = 0;
             }
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // elevatorPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
 
-            // Send calculated power to wheels
-            elevator.setPower(elevatorPower);
-            //rightDrive.setPower(rightPower);
+            elevator.setPower(elevatorPower);//rightDrive.setPower(rightPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

@@ -41,30 +41,30 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
  * The names of OpModes appear on the menu of the FTC Driver Station.
  * When a selection is made from the menu, the corresponding OpMode is executed.
- *
+ * <p>
  * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
  * This code will work with either a Mecanum-Drive or an X-Drive train.
  * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
  * Note that a Mecanum drive must display an X roller-pattern when viewed from above.
- *
+ * <p>
  * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
- *
+ * <p>
  * Holonomic drives provide the ability for the robot to move in three axes (directions) simultaneously.
  * Each motion axis is controlled by one Joystick axis.
- *
+ * <p>
  * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
  * 2) Lateral:  Strafing right and left                     Left-joystick Right and Left
  * 3) Yaw:      Rotating Clockwise and counter clockwise    Right-joystick Right and Left
- *
+ * <p>
  * This code is written assuming that the right-side motors need to be reversed for the robot to drive forward.
  * When you first test your robot, if it moves backward when you push the left stick forward, then you must flip
  * the direction of all 4 motors (see code below).
- *
+ * <p>
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Wallace TeleOp w elevator limit", group="Wallace")
+@TeleOp(name = "Wallace TeleOp w elevator limit", group = "Wallace")
 //@Disabled
 public class TeleopWithElevatorLimit extends LinearOpMode {
 
@@ -76,24 +76,32 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor elevator = null;
     private Servo grabber = null;
-    static final double CLOSE_POS     =  0.65;     // Maximum rotational position
-    static final double OPEN_POS     =  0.3;     // Minimum rotational position
-    double  grabber_position = OPEN_POS; // Start at halfway position
+    static final double CLOSE_POS = 0.65;     // Maximum rotational position
+    static final double OPEN_POS = 0.3;     // Minimum rotational position
+    double grabber_position = OPEN_POS; // Start at halfway position
     int countopen = 0;
     int countclose = 0;
-boolean open = true;
-boolean pushed = false;
-int elevatorposition_start = 0;
+    boolean open = true;
+    boolean pushed = false;
+// elevator variables
+    int elevatorposition_start = 0;
+    static final int LOW_POLE = 330;
+    static final int MEDIUM_POLE = 500;
+    static final int HIGH_POLE = 930;
+    static final double LOW_POLE_SPEED = 0.5;
+    static final double MEDIUM_POLE_SPEED = 0.8;
+    static final double HIGH_POLE_SPEED = 1.;
+
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "motor1");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "motor1");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "motor0");
-        leftBackDrive  = hardwareMap.get(DcMotorSimple.class, "motor3");
+        leftBackDrive = hardwareMap.get(DcMotorSimple.class, "motor3");
         rightBackDrive = hardwareMap.get(DcMotor.class, "motor2");
-        elevator  = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
         grabber = hardwareMap.get(Servo.class, "grabber");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -111,10 +119,16 @@ int elevatorposition_start = 0;
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         elevator.setDirection(DcMotor.Direction.FORWARD);
         //elevator.setMode(DcMotor.RunMode.RESET_ENCODER);
-elevatorposition_start = elevator.getCurrentPosition();
+        elevatorposition_start = elevator.getCurrentPosition();
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        int elevatorposition_start = elevator.getCurrentPosition();
+        int elevator_moveto = elevatorposition_start;
+        double elevator_fixed_speed = 0;
+        double elevatorPower = 0;
+        boolean move_up = true;
+        int move_down_offset = 0;
 
         waitForStart();
         runtime.reset();
@@ -124,17 +138,16 @@ elevatorposition_start = elevator.getCurrentPosition();
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y/2.;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x/2.;
-            double yaw     =  gamepad1.right_stick_x/2.;
+            double axial = -gamepad1.left_stick_y / 2.;  // Note: pushing stick forward gives negative value
+            double lateral = gamepad1.left_stick_x / 2.;
+            double yaw = gamepad1.right_stick_x / 2.;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower  = axial + lateral + yaw;
+            double leftFrontPower = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower   = axial - lateral + yaw;
-            double rightBackPower  = axial + lateral - yaw;
-            double elevatorPower = 0;
+            double leftBackPower = axial - lateral + yaw;
+            double rightBackPower = axial + lateral - yaw;
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
@@ -142,65 +155,105 @@ elevatorposition_start = elevator.getCurrentPosition();
             max = Math.max(max, Math.abs(rightBackPower));
 
             if (max > 1.0) {
-                leftFrontPower  /= max;
+                leftFrontPower /= max;
                 rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
+                leftBackPower /= max;
+                rightBackPower /= max;
             }
 
-            // This is test code:
-            //
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
 
-/*
-            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-*/
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
-            if (gamepad1.left_trigger > 0  && gamepad1.right_trigger == 0) {
-                elevatorPower = -0.5;
-            }
-            else if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0){
-                elevatorPower = gamepad1.right_trigger;
 
-                if (gamepad1.a)
-                {
-                    if (elevator.getCurrentPosition() - elevatorposition_start > 100)
-                    {
+// elevator
+            int current_elevator_position = elevator.getCurrentPosition() - elevatorposition_start;
+            if (gamepad1.a) {
+                elevator_moveto = LOW_POLE;
+                if (current_elevator_position < LOW_POLE) {
+                    elevatorPower = LOW_POLE_SPEED;
+                    move_up = true;
+                } else if (current_elevator_position > LOW_POLE) {
+                    move_up = false;
+                    elevatorPower = -LOW_POLE_SPEED;
+                    move_down_offset = 50;
+                } else {
+                    elevatorPower = 0;
+                }
+            }
+            if (gamepad1.b) {
+                elevator_moveto = MEDIUM_POLE;
+                if (current_elevator_position < MEDIUM_POLE) {
+                    elevatorPower = MEDIUM_POLE_SPEED;
+                    move_up = true;
+                } else if (current_elevator_position > MEDIUM_POLE) {
+                    move_up = false;
+                    elevatorPower = -MEDIUM_POLE_SPEED;
+                    move_down_offset = 120;
+                } else {
+                    elevatorPower = 0;
+                }
+            }
+            if (gamepad1.y) {
+                elevator_moveto = HIGH_POLE;
+                if (current_elevator_position < HIGH_POLE) {
+                    elevatorPower = HIGH_POLE_SPEED;
+                    move_up = true;
+                } else if (current_elevator_position > HIGH_POLE) {
+                    move_up = false;
+                    elevatorPower = -HIGH_POLE_SPEED;
+                    move_down_offset = 0;
+                } else {
+                    elevatorPower = 0;
+                }
+            }
+
+            if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
+                elevatorPower = gamepad1.right_trigger;
+                elevator_moveto = -1000;
+
+            } else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0) {
+                elevatorPower = Math.max(-0.5,-gamepad1.left_trigger);
+                elevator_moveto = -1000;
+            } else {
+                if (elevator_moveto < 0) {
+                    elevatorPower = 0;
+                }
+            }
+            if (elevator_moveto > 0) {
+                if (move_up) {
+                    if (current_elevator_position >= elevator_moveto) {
                         elevatorPower = 0;
+                        elevator_moveto = -1000;
+                    }
+                } else {
+                    if (current_elevator_position <= (elevator_moveto+move_down_offset)) {
+                        elevatorPower = 0;
+                        elevator_moveto = -1000;
                     }
                 }
-
-
             }
-            else {
+            if (elevatorPower < 0 && current_elevator_position <= 0) {
                 elevatorPower = 0;
             }
-            elevator.setPower(elevatorPower);
-            telemetry.addData("elevator position", "%d", elevator.getCurrentPosition() - elevatorposition_start);
+
+            elevator.setPower(elevatorPower);//rightDrive.setPower(rightPower);
+          telemetry.addData("elevator position", "%d", current_elevator_position);
             if ((gamepad1.right_bumper || gamepad1.left_bumper) && !pushed) {
                 pushed = true;
-                if (open) {grabber.setPosition(CLOSE_POS);
+                if (open) {
+                    grabber.setPosition(CLOSE_POS);
                     grabber_position = CLOSE_POS;
-                    open = false;}
-                else{grabber.setPosition(OPEN_POS);
+                    open = false;
+                } else {
+                    grabber.setPosition(OPEN_POS);
                     grabber_position = OPEN_POS;
-                    open = true;}
-            }
-            else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
+                    open = true;
+                }
+            } else if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
                 pushed = false;
             }
             grabber.setPosition(grabber_position);
@@ -210,4 +263,5 @@ elevatorposition_start = elevator.getCurrentPosition();
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.update();
         }
-    }}
+    }
+}
