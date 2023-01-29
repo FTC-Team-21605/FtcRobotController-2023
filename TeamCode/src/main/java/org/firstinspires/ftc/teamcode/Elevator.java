@@ -128,6 +128,19 @@ public class Elevator extends LinearOpMode {
                     elevatorPower = 0;
                 }
             }
+            if (gamepad1.x) {
+                elevator_moveto = elevatorposition_start;
+                if (current_elevator_position < elevatorposition_start) {
+                    elevatorPower = 0.5;
+                    move_up = true;
+                } else if (current_elevator_position > elevatorposition_start) {
+                    move_up = false;
+                    elevatorPower = -0.5;
+                    move_down_offset = 0;
+                } else {
+                    elevatorPower = 0;
+                }
+            }
 
             if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
                 elevatorPower = gamepad1.right_trigger;

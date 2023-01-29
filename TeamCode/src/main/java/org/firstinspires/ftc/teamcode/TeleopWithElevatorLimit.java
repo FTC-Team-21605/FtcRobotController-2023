@@ -81,13 +81,14 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
     int countopen = 0;
     int countclose = 0;
     // elevator variables
-    int elevatorposition_start = 0;
+    //int elevatorposition_start = 0;
     static final int LOW_POLE = 470;
     static final int MEDIUM_POLE = 720;
     static final int HIGH_POLE = 930;
-    static final double LOW_POLE_SPEED = 0.8;
+    static final double LOW_POLE_SPEED = 1.;
     static final double MEDIUM_POLE_SPEED = 1.;
     static final double HIGH_POLE_SPEED = 1.;
+    static final double DOWN_SPEED = -1.;
 
     @Override
     public void runOpMode() {
@@ -116,7 +117,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         elevator.setDirection(DcMotor.Direction.FORWARD);
         //elevator.setMode(DcMotor.RunMode.RESET_ENCODER);
-        elevatorposition_start = elevator.getCurrentPosition();
+        //elevatorposition_start = elevator.getCurrentPosition();
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -210,6 +211,19 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                     elevatorPower = 0;
                 }
             }
+            if (gamepad1.x) {
+                elevator_moveto = Math.max(elevatorposition_start,0);
+                if (current_elevator_position < elevatorposition_start) {
+                    elevatorPower = 0.5;
+                    move_up = true;
+                } else if (current_elevator_position > elevatorposition_start) {
+                    move_up = false;
+                    elevatorPower = DOWN_SPEED;
+                    move_down_offset = 0;
+                } else {
+                    elevatorPower = 0;
+                }
+            }
 
             if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
                 elevatorPower = gamepad1.right_trigger;
@@ -223,7 +237,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                     elevatorPower = 0;
                 }
             }
-            if (elevator_moveto > 0) {
+            if (elevator_moveto >= elevatorposition_start) {
                 if (move_up) {
                     if (current_elevator_position >= elevator_moveto) {
                         elevatorPower = 0;
@@ -262,6 +276,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Grabber Position", "%4.2f", grabber_position);
+            telemetry.addData("Move to, up", "%d, %b",elevator_moveto, move_up);
             telemetry.update();
         }
     }
