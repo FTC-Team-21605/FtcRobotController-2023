@@ -88,7 +88,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
     static final double LOW_POLE_SPEED = 1.;
     static final double MEDIUM_POLE_SPEED = 1.;
     static final double HIGH_POLE_SPEED = 1.;
-    static final double DOWN_SPEED = -1.;
+    static final double DOWN_SPEED = -0.8;
 
     @Override
     public void runOpMode() {
