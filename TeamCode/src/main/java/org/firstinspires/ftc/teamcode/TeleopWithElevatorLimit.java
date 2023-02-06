@@ -99,7 +99,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "motor0");
         leftBackDrive = hardwareMap.get(DcMotorSimple.class, "motor3");
         rightBackDrive = hardwareMap.get(DcMotor.class, "motor2");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+
         grabber = hardwareMap.get(Servo.class, "grabber");
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -115,8 +115,14 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
         leftBackDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+
+// elevator motor setup
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
         elevator.setDirection(DcMotor.Direction.FORWARD);
-        //elevator.setMode(DcMotor.RunMode.RESET_ENCODER);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // set to break on zero power to hold position
+        // hokey way to reset encoder
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //elevatorposition_start = elevator.getCurrentPosition();
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");

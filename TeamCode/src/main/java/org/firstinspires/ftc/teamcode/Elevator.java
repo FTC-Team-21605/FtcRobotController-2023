@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -58,10 +60,10 @@ public class Elevator extends LinearOpMode {
     static final int LOW_POLE = 330;
     static final int MEDIUM_POLE = 500;
     static final int HIGH_POLE = 930;
-    static final double LOW_POLE_SPEED = 0.5;
-    static final double MEDIUM_POLE_SPEED = 0.8;
+    static final double LOW_POLE_SPEED = 1.;
+    static final double MEDIUM_POLE_SPEED = 1.;
     static final double HIGH_POLE_SPEED = 1.;
-
+    static final double DOWN_SPEED = -0.8;
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -73,6 +75,10 @@ public class Elevator extends LinearOpMode {
         elevator = hardwareMap.get(DcMotor.class, "elevator");
 
         elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // hokey way to reset encoder
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         int elevatorposition_start = elevator.getCurrentPosition();
         int elevator_moveto = elevatorposition_start;
         double elevator_fixed_speed = 0;
