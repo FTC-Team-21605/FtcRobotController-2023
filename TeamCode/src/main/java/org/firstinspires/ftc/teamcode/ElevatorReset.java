@@ -68,7 +68,11 @@ public class ElevatorReset extends LinearOpMode {
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backward when connected directly to the battery
         elevator.setDirection(DcMotor.Direction.FORWARD);
-        //rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // hokey way to reset encoder
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         double elevatorPower = 0;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -82,23 +86,19 @@ public class ElevatorReset extends LinearOpMode {
             if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
                 elevatorPower = gamepad1.right_trigger;
 
-            }
-            else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0){
-                elevatorPower = Math.max(-gamepad1.left_trigger,-0.5);
-            }
-            else {
-                    elevatorPower = 0;
+            } else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0) {
+                elevatorPower = Math.max(-gamepad1.left_trigger, -0.5);
+            } else {
+                elevatorPower = 0;
 
             }
+            if (gamepad1.a) {
+                elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
 
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // elevatorPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
-
-            // Send calculated power to wheels
             elevator.setPower(elevatorPower);
-            //rightDrive.setPower(rightPower);
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

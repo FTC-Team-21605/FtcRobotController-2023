@@ -176,7 +176,12 @@ public class Elevator extends LinearOpMode {
             if (elevatorPower < 0 && current_elevator_position <= 0) {
                 elevatorPower = 0;
             }
+            if (gamepad1.right_bumper || gamepad1.left_bumper)
+            {
+                elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+            }
             elevator.setPower(elevatorPower);//rightDrive.setPower(rightPower);
 
             // Show the elapsed game time and wheel power.
