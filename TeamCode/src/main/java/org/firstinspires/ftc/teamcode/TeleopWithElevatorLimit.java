@@ -82,13 +82,13 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
     int countclose = 0;
     // elevator variables
     //int elevatorposition_start = 0;
-    static final int LOW_POLE = 470;
-    static final int MEDIUM_POLE = 720;
-    static final int HIGH_POLE = 930;
-    static final double LOW_POLE_SPEED = 1.;
-    static final double MEDIUM_POLE_SPEED = 1.;
+    static final int LOW_POLE = 870;
+    static final int MEDIUM_POLE = 1300;
+    static final int HIGH_POLE = 1760;
+    static final double LOW_POLE_SPEED = 0.7;
+    static final double MEDIUM_POLE_SPEED = 0.7;
     static final double HIGH_POLE_SPEED = 1.;
-    static final double DOWN_SPEED = -0.8;
+    static final double DOWN_SPEED = -0.5;
 
     @Override
     public void runOpMode() {
@@ -147,7 +147,10 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial = -gamepad1.left_stick_y / 2.;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x / 2.;
+            double lateral = 0.;
+            if (Math.abs(gamepad1.left_stick_x)>0.1) {
+                lateral = gamepad1.left_stick_x / 2.;
+            }
             double yaw = gamepad1.right_stick_x / 2.;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -230,9 +233,14 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                     elevatorPower = 0;
                 }
             }
+if (gamepad1.dpad_up){
+    elevator_moveto = current_elevator_position + 400;
+    move_up = true;
+    elevatorPower = 0.7;
+}
 
             if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
-                elevatorPower = gamepad1.right_trigger;
+                elevatorPower = Math.min(gamepad1.right_trigger, 0.8);
                 elevator_moveto = -1000;
 
             } else if (gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0) {
@@ -260,7 +268,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                 elevatorPower = 0;
             }
 
-            elevator.setPower(elevatorPower);//rightDrive.setPower(rightPower);
+            elevator.setPower(elevatorPower);
             telemetry.addData("elevator position", "%d", current_elevator_position);
             if ((gamepad1.right_bumper || gamepad1.left_bumper) && !pushed) {
                 pushed = true;
@@ -279,6 +287,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
             //grabber.setPosition(grabber_position);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("axial (ly), lateral (lx), yaw (ry) ", "%4.2f, %4.2f. %4.2f", axial, lateral, yaw);
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Grabber Position", "%4.2f", grabber_position);

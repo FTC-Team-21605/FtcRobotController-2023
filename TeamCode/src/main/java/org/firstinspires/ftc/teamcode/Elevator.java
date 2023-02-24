@@ -57,12 +57,12 @@ public class Elevator extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor elevator = null;
     //private DcMotorSimple rightDrive = null;
-    static final int LOW_POLE = 330;
-    static final int MEDIUM_POLE = 500;
-    static final int HIGH_POLE = 930;
-    static final double LOW_POLE_SPEED = 1.;
-    static final double MEDIUM_POLE_SPEED = 1.;
-    static final double HIGH_POLE_SPEED = 1.;
+    static final int LOW_POLE = 870;
+    static final int MEDIUM_POLE = 1300;
+    static final int HIGH_POLE = 1700;
+    static final double LOW_POLE_SPEED = 0.7;
+    static final double MEDIUM_POLE_SPEED = 0.7;
+    static final double HIGH_POLE_SPEED = 0.7;
     static final double DOWN_SPEED = -0.8;
     @Override
     public void runOpMode() {
