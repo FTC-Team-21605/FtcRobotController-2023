@@ -74,7 +74,7 @@ public class Elevator extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         elevator = hardwareMap.get(DcMotor.class, "elevator");
 
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.REVERSE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // hokey way to reset encoder
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -85,6 +85,7 @@ public class Elevator extends LinearOpMode {
         double elevatorPower = 0;
         boolean move_up = true;
         int move_down_offset = 0;
+        boolean dpad_pressed = false;
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -147,7 +148,15 @@ public class Elevator extends LinearOpMode {
                     elevatorPower = 0;
                 }
             }
-
+            if (gamepad1.dpad_up && !dpad_pressed){
+                elevator_moveto = current_elevator_position + 400;
+                move_up = true;
+                elevatorPower = 0.5;
+                dpad_pressed = true;
+            }
+            else if ( !gamepad1.dpad_up && dpad_pressed) {
+                dpad_pressed = false;
+            }
             if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
                 elevatorPower = gamepad1.right_trigger;
                 elevator_moveto = -1000;

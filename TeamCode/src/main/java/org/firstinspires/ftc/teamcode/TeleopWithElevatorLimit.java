@@ -118,7 +118,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
 
 // elevator motor setup
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.REVERSE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // set to break on zero power to hold position
         // hokey way to reset encoder
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -132,6 +132,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
         double elevator_fixed_speed = 0;
         double elevatorPower = 0;
         boolean move_up = true;
+        boolean dpad_pressed = false;
         int move_down_offset = 0;
 
         boolean open = false;
@@ -233,11 +234,16 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                     elevatorPower = 0;
                 }
             }
-if (gamepad1.dpad_up){
-    elevator_moveto = current_elevator_position + 400;
-    move_up = true;
-    elevatorPower = 0.7;
-}
+
+            if (gamepad1.dpad_up && !dpad_pressed){
+                elevator_moveto = current_elevator_position + 400;
+                move_up = true;
+                elevatorPower = 0.5;
+                dpad_pressed = true;
+            }
+            else if ( !gamepad1.dpad_up && dpad_pressed) {
+                dpad_pressed = false;
+            }
 
             if (gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0) {
                 elevatorPower = Math.min(gamepad1.right_trigger, 0.8);

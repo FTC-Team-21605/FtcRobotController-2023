@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -67,7 +68,7 @@ public class ElevatorReset extends LinearOpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backward when connected directly to the battery
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.REVERSE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // hokey way to reset encoder
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

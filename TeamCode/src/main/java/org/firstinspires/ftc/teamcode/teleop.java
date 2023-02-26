@@ -108,7 +108,7 @@ int elevatorposition_start = 0;
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 // elevator setup
         elevator  = hardwareMap.get(DcMotor.class, "elevator");
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.REVERSE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // break on stop
         // hokey way to reset encoder
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

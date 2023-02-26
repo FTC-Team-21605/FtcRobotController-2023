@@ -109,7 +109,7 @@ int elevatorposition_start = 0;
         leftBackDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.REVERSE);
         //elevator.setMode(DcMotor.RunMode.RESET_ENCODER);
 elevatorposition_start = elevator.getCurrentPosition();
         // Wait for the game to start (driver presses PLAY)
