@@ -84,7 +84,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
     //int elevatorposition_start = 0;
     static final int LOW_POLE = 870;
     static final int MEDIUM_POLE = 1300;
-    static final int HIGH_POLE = 1760;
+    static final int HIGH_POLE = 1700;
     static final double LOW_POLE_SPEED = 0.7;
     static final double MEDIUM_POLE_SPEED = 0.7;
     static final double HIGH_POLE_SPEED = 1.;
