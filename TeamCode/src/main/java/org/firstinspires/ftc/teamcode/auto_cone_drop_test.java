@@ -92,10 +92,16 @@ public class auto_cone_drop_test extends LinearOpMode {
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // This sample expects the IMU to be in a REV Hub and named "imu".
         imu = hardwareMap.get(IMU.class, "imu");
@@ -107,17 +113,38 @@ public class auto_cone_drop_test extends LinearOpMode {
         // Now initialize the IMU with this mounting orientation
         // Note: if you choose two conflicting directions, this initialization will cause a code exception.
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+        imu.resetYaw();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S1:
+        double turnpower = TURN_SPEED;
+        double leftFrontPower = turnpower;
+        double rightFrontPower = -turnpower;
+        double leftBackPower = turnpower;
+        double rightBackPower = -turnpower;
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+        while(orientation.getYaw(AngleUnit.DEGREES) < 45) {
+            orientation = imu.getRobotYawPitchRollAngles();
+            sleep(10);
+
+}
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            encoderDrive(-DRIVE_SPEED, -50, -50, 5.0);  // S1:
+ //           encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S1:
             // Setup a variable for each drive wheel to save power level for telemetry
             // Retrieve Rotational Angles and Velocities
-            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+            //YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
         //    telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftFrontPower, rightFrontPower);
@@ -159,10 +186,10 @@ public class auto_cone_drop_test extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
-            leftFrontDrive.setPower(speed);
-            rightFrontDrive.setPower(speed);
-            leftBackDrive.setPower(speed);
-            rightBackDrive.setPower(speed);
+            leftFrontDrive.setPower(Math.abs(speed));
+            rightFrontDrive.setPower(Math.abs(speed));
+            leftBackDrive.setPower(Math.abs(speed));
+            rightBackDrive.setPower(Math.abs(speed));
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
