@@ -189,7 +189,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                     move_up = true;
                 } else if (current_elevator_position > LOW_POLE) {
                     move_up = false;
-                    elevatorPower = -LOW_POLE_SPEED;
+                    elevatorPower = DOWN_SPEED; //-LOW_POLE_SPEED;
                     move_down_offset = 50;
                 } else {
                     elevatorPower = 0;
@@ -202,7 +202,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                     move_up = true;
                 } else if (current_elevator_position > MEDIUM_POLE) {
                     move_up = false;
-                    elevatorPower = -MEDIUM_POLE_SPEED;
+                    elevatorPower = DOWN_SPEED; //-MEDIUM_POLE_SPEED;
                     move_down_offset = 120;
                 } else {
                     elevatorPower = 0;
@@ -215,7 +215,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
                     move_up = true;
                 } else if (current_elevator_position > HIGH_POLE) {
                     move_up = false;
-                    elevatorPower = -HIGH_POLE_SPEED;
+                    elevatorPower = DOWN_SPEED; //-HIGH_POLE_SPEED;
                     move_down_offset = 0;
                 } else {
                     elevatorPower = 0;
