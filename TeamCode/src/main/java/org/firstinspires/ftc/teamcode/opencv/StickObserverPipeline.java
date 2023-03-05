@@ -5,6 +5,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class StickObserverPipeline extends OpenCvPipeline {
     //these are public static to be tuned in dashboard
     public static double strictLowS = 140;
     public static double strictHighS = 255;
+    private List<MatOfPoint> contours = new ArrayList<>();
 
     public StickObserverPipeline() {
         frameList = new ArrayList<>();
@@ -37,6 +39,8 @@ public class StickObserverPipeline extends OpenCvPipeline {
         // lenient bounds will filter out near yellow, this should filter out all near yellow things(tune this if needed)
         Scalar lowHSV = new Scalar(20, 70, 80); // lenient lower bound HSV for yellow
         Scalar highHSV = new Scalar(32, 255, 255); // lenient higher bound HSV for yellow
+        //Scalar lowHSV = new Scalar(20, 100, 100); // lenient lower bound HSV for yellow
+        //Scalar highHSV = new Scalar(27, 255, 255); // lenient higher bound HSV for yellow
 
         Mat thresh = new Mat();
 
@@ -71,9 +75,10 @@ public class StickObserverPipeline extends OpenCvPipeline {
         Imgproc.Canny(scaledThresh, edges, 100, 200);
 
         //contours, apply post processing to information
-        List<MatOfPoint> contours = new ArrayList<>();
+        //List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         //find contours, input scaledThresh because it has hard edges
+        contours.clear();
         Imgproc.findContours(scaledThresh, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
         //list of frames to reduce inconsistency, not too many so that it is still real-time, change the number from 5 if you want
@@ -84,7 +89,7 @@ public class StickObserverPipeline extends OpenCvPipeline {
 
         //release all the data
         input.release();
-        scaledThresh.copyTo(input);
+        thresh.copyTo(input);
         scaledThresh.release();
         scaledMask.release();
         mat.release();
@@ -92,6 +97,7 @@ public class StickObserverPipeline extends OpenCvPipeline {
         edges.release();
         thresh.release();
         finalMask.release();
+        hierarchy.release();
         //change the return to whatever mat you want
         //for example, if I want to look at the lenient thresh:
         // return thresh;
@@ -100,5 +106,8 @@ public class StickObserverPipeline extends OpenCvPipeline {
         return input;
     }
 
-
+    public List<MatOfPoint> getLatestDetections()
+    {
+       return contours;
+   }
 }
