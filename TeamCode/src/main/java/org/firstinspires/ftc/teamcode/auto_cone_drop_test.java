@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -64,13 +65,18 @@ public class auto_cone_drop_test extends LinearOpMode {
     private DcMotorSimple leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor elevator = null;
+    private Servo grabber = null;
+    static final double CLOSE_POS     =  0.6;     // Maximum rotational position
+    static final double OPEN_POS = 0.37;     // Minimum rotational position
+
     static final double COUNTS_PER_MOTOR_REV = 28;    // eg: TETRIX Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 20.0;     // No External Gearing.
     static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double DRIVE_SPEED = 0.2;
-    static final double TURN_SPEED = 0.5;
+    //static final double TURN_SPEED = 0.2;
 
     // The IMU sensor object
     IMU imu;
@@ -88,6 +94,9 @@ public class auto_cone_drop_test extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "motor0");
         leftBackDrive = hardwareMap.get(DcMotorSimple.class, "motor3");
         rightBackDrive = hardwareMap.get(DcMotor.class, "motor2");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        grabber = hardwareMap.get(Servo.class, "grabber");
+
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -102,6 +111,12 @@ public class auto_cone_drop_test extends LinearOpMode {
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        elevator.setDirection(DcMotor.Direction.REVERSE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         // This sample expects the IMU to be in a REV Hub and named "imu".
         imu = hardwareMap.get(IMU.class, "imu");
@@ -118,18 +133,29 @@ public class auto_cone_drop_test extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S1:
-        double turnpower = TURN_SPEED;
-        double leftFrontPower = turnpower;
-        double rightFrontPower = -turnpower;
-        double leftBackPower = turnpower;
-        double rightBackPower = -turnpower;
+        encoderDrive(DRIVE_SPEED, 1, 1, 5.0);  // S1:
+        grabber.setPosition(CLOSE_POS);
+        sleep(1000);
+        elevator.setPower(0.5);//rightDrive.setPower(rightPower);
+
+        while(elevator.getCurrentPosition() < 1000)
+        {sleep(10);}
+            elevator.setPower(0);//rightDrive.setPower(rightPower);
+
+
+        encoderDrive(DRIVE_SPEED, 9.5, 9.5, 5.0);  // S1:
+
+
+        double leftFrontPower = -turnpower;
+        double rightFrontPower = turnpower;
+        double leftBackPower = -turnpower;
+        double rightBackPower = turnpower;
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
-        while(orientation.getYaw(AngleUnit.DEGREES) < 45) {
+        while(orientation.getYaw(AngleUnit.DEGREES) < 84) {
             orientation = imu.getRobotYawPitchRollAngles();
             sleep(10);
 
@@ -138,7 +164,37 @@ public class auto_cone_drop_test extends LinearOpMode {
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
         rightBackDrive.setPower(0);
+        drive_back(70);
+        elevator.setPower(-0.3);//rightDrive.setPower(rightPower);
 
+        while(elevator.getCurrentPosition() > 800)
+        {sleep(10);}
+        elevator.setPower(0);
+        sleep (1000);
+    //    encoderDrive(DRIVE_SPEED, -5, -5, 5.0);  // S1:
+        grabber.setPosition(OPEN_POS);
+        sleep(1000);
+
+        encoderDrive(DRIVE_SPEED, 3, 3, 5.0);
+
+        leftFrontPower = turnpower;
+        rightFrontPower = -turnpower;
+        leftBackPower = turnpower;
+        rightBackPower = -turnpower;
+        orientation = imu.getRobotYawPitchRollAngles();
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+
+        while(orientation.getYaw(AngleUnit.DEGREES) > 5) {
+            orientation = imu.getRobotYawPitchRollAngles();
+            sleep(10);
+        }
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
  //           encoderDrive(DRIVE_SPEED, 50, 50, 5.0);  // S1:
@@ -162,6 +218,24 @@ public class auto_cone_drop_test extends LinearOpMode {
         }
     }
 
+    public void drive_back(int rotations)
+    {
+        double speed = -0.2;
+        int currpos = leftFrontDrive.getCurrentPosition();
+        leftFrontDrive.setPower(speed);
+        rightFrontDrive.setPower(speed);
+        leftBackDrive.setPower(speed);
+        rightBackDrive.setPower(speed);
+        while(leftFrontDrive.getCurrentPosition()-currpos > -100)
+        {sleep(10);}
+
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
+
+
+    }
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {
