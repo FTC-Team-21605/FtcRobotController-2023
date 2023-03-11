@@ -23,7 +23,6 @@ package org.firstinspires.ftc.teamcode.opencv;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -41,9 +40,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-@Autonomous(name="Autonomous April Tags Cone Drop", group="Wallace")
-@Disabled
-public class autonomous_april_tags_cone_drop extends LinearOpMode
+@Autonomous(name="Autonomous April Tags Cone Drop Left", group="Wallace")
+public class autonomous_april_tags_cone_drop_left extends LinearOpMode
 {
     private DcMotor         leftFrontDrive   = null;
     private DcMotor         rightFrontDrive  = null;
@@ -282,19 +280,19 @@ public class autonomous_april_tags_cone_drop extends LinearOpMode
             rightBackDrive.setPower(rightBackPower);
             while(orientation.getYaw(AngleUnit.DEGREES) < 84) {
                 orientation = imu.getRobotYawPitchRollAngles();
-                sleep(10);
+                sleep(5);
 
             }
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
             leftBackDrive.setPower(0);
             rightBackDrive.setPower(0);
-            drive_back(65);
+            drive_back(7);
             sleep(500);
             elevator.setPower(-0.3);//rightDrive.setPower(rightPower);
 
             while(elevator.getCurrentPosition() > 700)
-            {sleep(10);}
+            {sleep(5);}
             elevator.setPower(0);
             sleep (1000);
             //    encoderDrive(DRIVE_SPEED, -5, -5, 5.0);  // S1:
@@ -315,7 +313,7 @@ public class autonomous_april_tags_cone_drop extends LinearOpMode
 
             while(orientation.getYaw(AngleUnit.DEGREES) > 5) {
                 orientation = imu.getRobotYawPitchRollAngles();
-                sleep(10);
+                sleep(5);
             }
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
@@ -340,7 +338,7 @@ public class autonomous_april_tags_cone_drop extends LinearOpMode
                 rightBackDrive.setPower(rightBackPower);
 
                 while (orientation.getYaw(AngleUnit.DEGREES) >-85) {
-                    sleep(10);
+                    sleep(5);
                     telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                     telemetry.update();
                     orientation = imu.getRobotYawPitchRollAngles();
@@ -361,7 +359,7 @@ public class autonomous_april_tags_cone_drop extends LinearOpMode
                 leftBackDrive.setPower(leftBackPower);
                 rightBackDrive.setPower(rightBackPower);
                 while (orientation.getYaw(AngleUnit.DEGREES) < -5) {
-                    sleep(10);
+                    sleep(5);
                     telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                     telemetry.update();
                     orientation = imu.getRobotYawPitchRollAngles();
@@ -392,7 +390,7 @@ public class autonomous_april_tags_cone_drop extends LinearOpMode
                 rightBackDrive.setPower(rightBackPower);
 
                 while (orientation.getYaw(AngleUnit.DEGREES) < 85) {
-                    sleep(10);
+                    sleep(5);
                     telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                     telemetry.update();
                     orientation = imu.getRobotYawPitchRollAngles();
@@ -413,7 +411,7 @@ public class autonomous_april_tags_cone_drop extends LinearOpMode
                 leftBackDrive.setPower(leftBackPower);
                 rightBackDrive.setPower(rightBackPower);
                 while (orientation.getYaw(AngleUnit.DEGREES) > 5) {
-                    sleep(10);
+                    sleep(5);
                     telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
                     telemetry.update();
                     orientation = imu.getRobotYawPitchRollAngles();
@@ -471,8 +469,8 @@ elevator.setPower(-0.2);
         rightFrontDrive.setPower(speed);
         leftBackDrive.setPower(speed);
         rightBackDrive.setPower(speed);
-        while(leftFrontDrive.getCurrentPosition()-currpos > -100)
-        {sleep(10);}
+        while(leftFrontDrive.getCurrentPosition()-currpos > -rotations)
+        {sleep(5);}
 
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);

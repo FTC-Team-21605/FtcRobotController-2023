@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode.opencv;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp(name = "OpenCV Test", group = "ZZDevel")
+@Disabled
 public class WebcamExample extends LinearOpMode {
     OpenCvWebcam webcam;
     StickObserverPipeline stickObserverPipeline;

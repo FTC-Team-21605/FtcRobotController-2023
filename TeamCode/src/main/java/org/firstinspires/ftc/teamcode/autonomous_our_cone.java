@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -76,7 +77,7 @@ import java.util.Objects;
  */
 
 @Autonomous(name="Wallace autonomous our cone", group="Wallace")
-//@Disabled
+@Disabled
 public class autonomous_our_cone extends LinearOpMode {
 
     /* Declare OpMode members. */
