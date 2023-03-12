@@ -149,7 +149,7 @@ public class TeleopWithElevatorLimit extends LinearOpMode {
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial = -gamepad1.left_stick_y / 2.;  // Note: pushing stick forward gives negative value
             double lateral = 0.;
-            if (Math.abs(gamepad1.left_stick_x)>0.2) {
+            if (Math.abs(gamepad1.left_stick_x)>0.8) {
                 lateral = gamepad1.left_stick_x / 2.;
             }
             double yaw = gamepad1.right_stick_x / 2.;
