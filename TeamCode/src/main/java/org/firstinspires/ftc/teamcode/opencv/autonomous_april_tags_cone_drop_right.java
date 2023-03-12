@@ -260,14 +260,13 @@ public class autonomous_april_tags_cone_drop_right extends LinearOpMode
             encoderDrive(DRIVE_SPEED, 1, 1, 5.0);  // S1:
             grabber.setPosition(CLOSE_POS);
             sleep(1000);
+
+            encoderDrive(DRIVE_SPEED, 9.5, 9.5, 5.0);  // S1:
             elevator.setPower(0.5);//rightDrive.setPower(rightPower);
 
             while(elevator.getCurrentPosition() < 1000)
             {sleep(10);}
             elevator.setPower(0);//rightDrive.setPower(rightPower);
-
-
-            encoderDrive(DRIVE_SPEED, 9.5, 9.5, 5.0);  // S1:
 
             double turnpower = TURN_SPEED;
             double leftFrontPower = -turnpower;
