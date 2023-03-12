@@ -287,14 +287,14 @@ public class autonomous_april_tags_cone_drop_left extends LinearOpMode
             rightFrontDrive.setPower(0);
             leftBackDrive.setPower(0);
             rightBackDrive.setPower(0);
-            drive_back(7);
+            drive_back(30);
             sleep(500);
             elevator.setPower(-0.3);//rightDrive.setPower(rightPower);
 
             while(elevator.getCurrentPosition() > 700)
             {sleep(5);}
             elevator.setPower(0);
-            sleep (1000);
+            sleep (500);
             //    encoderDrive(DRIVE_SPEED, -5, -5, 5.0);  // S1:
             grabber.setPosition(OPEN_POS);
             sleep(1000);
@@ -347,7 +347,7 @@ public class autonomous_april_tags_cone_drop_left extends LinearOpMode
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
-                sleep(1000);
+                sleep(500);
                 encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
                 leftFrontPower = turnpower;
                 rightFrontPower = -turnpower;
@@ -399,7 +399,7 @@ public class autonomous_april_tags_cone_drop_left extends LinearOpMode
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
-                sleep(1000);
+                sleep(500);
                 encoderDrive(DRIVE_SPEED, 22, 22, 5.0);  // S1: Forward 47
                 leftFrontPower = -turnpower;
                 rightFrontPower = turnpower;
@@ -420,11 +420,11 @@ public class autonomous_april_tags_cone_drop_left extends LinearOpMode
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
-                sleep(1000);
+                sleep(500);
                 encoderDrive(DRIVE_SPEED, 5, 5, 5.0);  // S1: Forward 47
                 //    telemetry.addData("Path", "Complete");
                 //    telemetry.update();
-                //  sleep(1000);  // pause to display final telemetry message.
+                //  sleep(500);  // pause to display final telemetry message.
             }
 elevator.setPower(-0.2);
             while(elevator.getCurrentPosition() > 5)
