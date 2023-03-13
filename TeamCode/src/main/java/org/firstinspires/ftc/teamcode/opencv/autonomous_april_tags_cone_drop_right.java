@@ -320,7 +320,7 @@ public class autonomous_april_tags_cone_drop_right extends LinearOpMode
             rightBackDrive.setPower(0);
 
             if (tagOfInterest.id == ID_TAG_LOCATION_2 ) encoderDrive(DRIVE_SPEED, 15, 15, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-            else if (tagOfInterest.id == ID_TAG_LOCATION_1) {
+            else if (tagOfInterest.id == ID_TAG_LOCATION_3) {
                 encoderDrive(DRIVE_SPEED, 10, 10, 5.0);
 //            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
@@ -373,7 +373,7 @@ public class autonomous_april_tags_cone_drop_right extends LinearOpMode
                 //  sleep(500);  // pause to display final telemetry message.
 
             }
-            else if (tagOfInterest.id == ID_TAG_LOCATION_3) {
+            else if (tagOfInterest.id == ID_TAG_LOCATION_1) {
                 encoderDrive(DRIVE_SPEED, 10, 10, 5.0);
 //            encoderDrive(DRIVE_SPEED, 2, 2, 5.0);  // S1: Forward 47
                 telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
