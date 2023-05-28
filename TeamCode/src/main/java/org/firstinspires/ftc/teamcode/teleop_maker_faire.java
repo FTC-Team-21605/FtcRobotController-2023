@@ -144,6 +144,16 @@ public class teleop_maker_faire extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            if ((gamepad2.right_bumper || gamepad2.left_bumper ||
+                    gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0)) {
+                leftFrontDrive.setPower(0.);
+                rightFrontDrive.setPower(0.);
+                leftBackDrive.setPower(0.);
+                rightBackDrive.setPower(0.);
+                elevator.setPower(0.);
+                continue;
+
+            }
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
